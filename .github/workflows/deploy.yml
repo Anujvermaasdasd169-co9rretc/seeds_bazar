@@ -1,0 +1,83 @@
+name: Deploy App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_mysql, bcmath
+          tools: composer
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy app
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: ".,!node_modules,!.git,!.github,!tests,!.env,!.env.example"
+          target: "/var/www/html/seeds_bazar"
+          strip_components: 0
+
+      - name: Create .env
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          envs: ENV_FILE
+          script: |
+            mkdir -p /var/www/html/seeds_bazar
+            printf "%s" "$ENV_FILE" > /var/www/html/seeds_bazar/.env
+
+      - name: Install, migrate, and cache
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd /var/www/html/seeds_bazar
+
+            command -v php >/dev/null 2>&1 || { echo "php not found on server"; exit 1; }
+            command -v composer >/dev/null 2>&1 || { echo "composer not found on server"; exit 1; }
+
+            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+            php artisan migrate --force
+            php artisan storage:link || true
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            chown -R www-data:www-data storage bootstrap/cache
+            chmod -R ug+rwx storage bootstrap/cache
