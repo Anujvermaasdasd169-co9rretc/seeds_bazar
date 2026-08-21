@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Seeds Bazar — Buy Quality Seeds Online')
+@section('title', 'Seed Planta — Buy Quality Seeds Online')
 
 @section('content')
 <div class="shop" id="shop-app"
@@ -13,7 +13,7 @@
             <a href="{{ route('shop.index') }}" class="logo">
                 <x-site-logo class="logo__icon" />
                 <span class="logo__text">
-                    <strong>Seeds Bazar</strong>
+                    <strong>Seed Planta</strong>
                     <small>{{ $tagline }}</small>
                 </span>
             </a>
@@ -58,7 +58,7 @@
                         <span aria-hidden="true">→</span>
                     </a>
                     <a class="hero-btn hero-btn--ghost"
-                       href="https://wa.me/{{ preg_replace('/\\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seeds Bazar, I want to buy seeds. Please share availability & price list.') }}"
+                       href="https://wa.me/{{ preg_replace('/\\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds. Please share availability & price list.') }}"
                        target="_blank" rel="noopener noreferrer">
                         WhatsApp
                     </a>
@@ -160,7 +160,7 @@
                 <a href="{{ route('shop.index') }}" class="footer__logo">
                     <x-site-logo class="footer__logo-icon" />
                     <span>
-                        <strong>Seeds Bazar</strong>
+                        <strong>Seed Planta</strong>
                         <small>{{ $tagline }}</small>
                     </span>
                 </a>
@@ -178,7 +178,7 @@
             <div class="footer__col">
                 <h3>Help</h3>
                 <button type="button" class="footer__text-btn" id="contact-open-footer">Contact Us</button>
-                <a href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seeds Bazar, I want to buy seeds. Please share availability & price list.') }}"
+                <a href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds. Please share availability & price list.') }}"
                    target="_blank" rel="noopener noreferrer">WhatsApp order</a>
                 <a href="{{ route('admin.login') }}">Admin login</a>
             </div>
@@ -187,14 +187,14 @@
                 <h3>Order on WhatsApp</h3>
                 <p>Fast confirmation. No checkout hassle.</p>
                 <a class="footer__wa"
-                   href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seeds Bazar, I want to buy seeds.') }}"
+                   href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds.') }}"
                    target="_blank" rel="noopener noreferrer">
                     Chat now
                 </a>
             </div>
         </div>
         <div class="footer__bottom">
-            <p>&copy; {{ date('Y') }} Seeds Bazar. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Seed Planta. All rights reserved.</p>
             <p>Orders are confirmed on WhatsApp</p>
         </div>
     </footer>
