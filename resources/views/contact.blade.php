@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us — Seeds Bazar')
+@section('title', 'Contact Us — Seed Planta')
 
 @section('content')
 <div class="contact-wrap">

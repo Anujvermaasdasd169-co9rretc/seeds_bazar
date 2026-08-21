@@ -212,7 +212,7 @@
     function buildWhatsAppMessage(cart) {
         const total = getCartTotal(cart);
         let lines = [
-            '🌱 *Seeds Bazar — New Order*',
+            '🌱 *Seed Planta — New Order*',
             '',
             '*Order Details:*',
         ];

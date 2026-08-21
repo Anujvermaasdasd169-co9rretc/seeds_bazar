@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login — Seeds Bazar</title>
+    <title>Admin Login — Seed Planta</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
@@ -12,7 +12,7 @@
         <div class="login-card__header">
             <span class="login-card__icon">🌱</span>
             <h1>Admin Login</h1>
-            <p>Seeds Bazar management panel</p>
+            <p>Seed Planta management panel</p>
         </div>
 
         @if ($errors->any())
