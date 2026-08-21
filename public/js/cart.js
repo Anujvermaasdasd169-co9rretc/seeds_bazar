@@ -399,14 +399,12 @@
         contactSuccess.hidden = true;
 
         const formData = new FormData(contactForm);
-        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
         try {
             const res = await fetch(contactForm.action, {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrf,
                     'Accept': 'application/json',
                 },
                 body: formData,

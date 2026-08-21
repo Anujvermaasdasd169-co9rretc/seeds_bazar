@@ -199,8 +199,7 @@
             <div class="modal__alert modal__alert--success" id="contact-success" hidden></div>
             <div class="modal__alert modal__alert--error" id="contact-error" hidden></div>
 
-            <form id="contact-form" method="POST" action="{{ route('contact.store') }}" class="modal-form" novalidate>
-                @csrf
+            <form id="contact-form" method="POST" action="{{ route('contact.store', absolute: false) }}" class="modal-form" novalidate>
                 <div class="modal-grid">
                     <label class="modal-field">
                         <span>Name *</span>

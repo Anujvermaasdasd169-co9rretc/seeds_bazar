@@ -22,9 +22,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('contact.store') }}" class="contact-form">
-            @csrf
-
+        <form method="POST" action="{{ route('contact.store', absolute: false) }}" class="contact-form">
             <div class="contact-field">
                 <label for="name">Name *</label>
                 <input id="name" name="name" type="text" value="{{ old('name') }}" required maxlength="100" placeholder="Your name">
