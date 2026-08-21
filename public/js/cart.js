@@ -390,6 +390,7 @@
     }
 
     contactOpen?.addEventListener('click', openContact);
+    document.getElementById('contact-open-footer')?.addEventListener('click', openContact);
     contactClose?.addEventListener('click', closeContact);
     contactOverlay?.addEventListener('click', closeContact);
 

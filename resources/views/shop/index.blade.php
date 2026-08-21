@@ -155,8 +155,48 @@
     </main>
 
     <footer class="footer">
-        <p>&copy; {{ date('Y') }} Seeds Bazar. All rights reserved.</p>
-        <p class="footer__note">Orders are confirmed on WhatsApp · <a href="{{ route('admin.login') }}">Admin</a></p>
+        <div class="footer__inner">
+            <div class="footer__brand">
+                <a href="{{ route('shop.index') }}" class="footer__logo">
+                    <x-site-logo class="footer__logo-icon" />
+                    <span>
+                        <strong>Seeds Bazar</strong>
+                        <small>{{ $tagline }}</small>
+                    </span>
+                </a>
+                <p class="footer__about">Premium vegetable, fruit, flower &amp; grain seeds. Order in one click on WhatsApp.</p>
+            </div>
+
+            <div class="footer__col">
+                <h3>Shop</h3>
+                <a href="#products-grid">All products</a>
+                @foreach ($categories as $label)
+                    <a href="#products-grid">{{ $label }}</a>
+                @endforeach
+            </div>
+
+            <div class="footer__col">
+                <h3>Help</h3>
+                <button type="button" class="footer__text-btn" id="contact-open-footer">Contact Us</button>
+                <a href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seeds Bazar, I want to buy seeds. Please share availability & price list.') }}"
+                   target="_blank" rel="noopener noreferrer">WhatsApp order</a>
+                <a href="{{ route('admin.login') }}">Admin login</a>
+            </div>
+
+            <div class="footer__col footer__col--cta">
+                <h3>Order on WhatsApp</h3>
+                <p>Fast confirmation. No checkout hassle.</p>
+                <a class="footer__wa"
+                   href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seeds Bazar, I want to buy seeds.') }}"
+                   target="_blank" rel="noopener noreferrer">
+                    Chat now
+                </a>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <p>&copy; {{ date('Y') }} Seeds Bazar. All rights reserved.</p>
+            <p>Orders are confirmed on WhatsApp</p>
+        </div>
     </footer>
 
     {{-- Cart drawer --}}
