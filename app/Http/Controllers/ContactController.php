@@ -12,6 +12,7 @@ class ContactController extends Controller
 {
     public function show(): View
     {
+		
         return view('contact');
     }
 
