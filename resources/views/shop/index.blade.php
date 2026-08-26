@@ -10,15 +10,8 @@
 
     <header class="header">
         <div class="header__inner">
-            {{-- <a href="{{ route('shop.index') }}" class="logo">
-                <x-site-logo class="logo__icon" />
-            </a> --}}
-
             <a href="{{ route('shop.index') }}" class="logo">
-                <x-site-logo 
-                    class="logo__icon"
-                    style="width: 180px; height: 60px; object-fit: contain; display: block; border: 1px solid #ddd; border-radius: 4px; padding: 5px; background: #fff;"
-                />
+                <x-site-logo class="logo__icon" />
             </a>
 
             <div class="header-actions">
