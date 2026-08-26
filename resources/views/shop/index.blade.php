@@ -14,6 +14,24 @@
                 <x-site-logo class="logo__icon" />
             </a>
 
+            <nav class="header-nav" aria-label="Main">
+                <a href="{{ route('shop.index') }}" class="header-nav__link" id="nav-home">Home</a>
+                <div class="header-nav__item" id="seeds-menu">
+                    <button type="button" class="header-nav__link header-nav__link--btn" id="seeds-toggle" aria-expanded="false" aria-controls="seeds-drop">
+                        Seeds
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </button>
+                    <div class="header-nav__drop" id="seeds-drop" hidden>
+                        <button type="button" class="header-nav__drop-item" data-nav-category="all">All Seeds</button>
+                        @foreach ($categories as $key => $label)
+                            <button type="button" class="header-nav__drop-item" data-nav-category="{{ $key }}">{{ $label }}</button>
+                        @endforeach
+                    </div>
+                </div>
+            </nav>
+
             <div class="header-search" id="header-search">
                 <div class="header-search__box">
                     <svg class="header-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
