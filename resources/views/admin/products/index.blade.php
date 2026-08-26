@@ -6,10 +6,26 @@
 <div class="page-header page-header--row">
     <div>
         <h1>Products</h1>
-        <p>Manage seeds shown on the storefront</p>
+        {{-- <p>Manage seeds shown on the storefront</p> --}}
     </div>
     <a href="{{ route('admin.products.create') }}" class="btn btn--primary">+ Add Product</a>
 </div>
+
+<form method="GET" action="{{ route('admin.products.index') }}" class="admin-toolbar">
+    <label class="admin-toolbar__field">
+        {{-- <span>Category</span> --}}
+        <select name="category_id" onchange="this.form.submit()">
+            <option value="">All categories</option>
+            @foreach ($categories as $category)
+                <option value="{{ $category->id }}" @selected($categoryId === $category->id)>{{ $category->name }}</option>
+            @endforeach
+        </select>
+    </label>
+    @if ($categoryId)
+        <a href="{{ route('admin.products.index') }}" class="btn btn--sm btn--outline">Clear filter</a>
+    @endif
+    {{-- <p class="admin-toolbar__count">{{ $products->total() }} {{ $products->total() === 1 ? 'product' : 'products' }}</p> --}}
+</form>
 
 <div class="table-wrap">
     <table class="data-table">
@@ -57,10 +73,18 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="empty-cell">No products yet. <a href="{{ route('admin.products.create') }}">Add one</a></td>
+                    <td colspan="6" class="empty-cell">
+                        @if ($categoryId)
+                            No products in this category.
+                        @else
+                            No products yet. <a href="{{ route('admin.products.create') }}">Add one</a>
+                        @endif
+                    </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 </div>
+
+{{ $products->links('vendor.pagination.admin') }}
 @endsection

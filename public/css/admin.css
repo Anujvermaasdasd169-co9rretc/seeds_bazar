@@ -383,6 +383,98 @@ code { font-size: 0.8rem; background: #f0f0f0; padding: 0.15rem 0.4rem; border-r
     background: #ffe5e7;
 }
 
+.admin-toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.admin-toolbar__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 220px;
+}
+
+.admin-toolbar__field span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-toolbar__field select {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font: inherit;
+    background: var(--white);
+    min-width: 220px;
+}
+
+.admin-toolbar__count {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding-bottom: 0.45rem;
+}
+
+.admin-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.admin-pagination__info {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.admin-pagination__list {
+    display: flex;
+    gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.7rem;
+    border-radius: 10px;
+    border: 1px solid rgba(45, 106, 79, 0.16);
+    background: var(--white);
+    color: var(--green-800);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.admin-pagination__btn.is-current {
+    background: var(--green-700);
+    border-color: var(--green-700);
+    color: #fff;
+}
+
+.admin-pagination__btn.is-disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.admin-pagination__btn:not(.is-disabled):not(.is-current):hover {
+    background: var(--green-50);
+}
+
 @media (max-width: 768px) {
     .admin-body { flex-direction: column; }
     .admin-sidebar { width: 100%; }

@@ -5,8 +5,8 @@
 @section('content')
 <div class="shop" id="shop-app"
      data-whatsapp="{{ $whatsappNumber }}"
-     data-currency="{{ $currency }}"
-     data-products='@json($products)'>
+     data-currency="{{ $currency }}">
+    <script type="application/json" id="shop-products">@json($products)</script>
 
     <header class="header">
         <div class="header__inner">
@@ -29,7 +29,7 @@
                            aria-label="Search products"
                            aria-controls="search-results"
                            aria-expanded="false">
-                    <kbd class="header-search__hint">/</kbd>
+                    {{-- <kbd class="header-search__hint"></kbd> --}}
                     <button type="button" class="header-search__clear" id="search-clear" hidden aria-label="Clear search">&times;</button>
                 </div>
                 <div class="header-search__drop" id="search-results" hidden role="listbox" aria-label="Search results"></div>
@@ -324,5 +324,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/cart.js') }}" defer></script>
+<script src="{{ asset('js/cart.js') }}?v={{ @filemtime(public_path('js/cart.js')) ?: time() }}" defer></script>
 @endpush

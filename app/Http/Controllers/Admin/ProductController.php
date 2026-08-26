@@ -13,13 +13,21 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $products = Product::with('category')
-            ->orderByDesc('created_at')
-            ->get();
+        $categoryId = $request->filled('category_id')
+            ? $request->integer('category_id')
+            : null;
 
-        return view('admin.products.index', compact('products'));
+        $products = Product::with('category')
+            ->when($categoryId, fn ($query) => $query->where('category_id', $categoryId))
+            ->orderByDesc('created_at')
+            ->paginate(8)
+            ->withQueryString();
+
+        $categories = Category::orderBy('sort_order')->get();
+
+        return view('admin.products.index', compact('products', 'categories', 'categoryId'));
     }
 
     public function create(): View

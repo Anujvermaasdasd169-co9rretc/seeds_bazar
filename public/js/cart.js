@@ -9,7 +9,9 @@
     const currency = shop.dataset.currency || '₹';
     let products = [];
     try {
-        products = JSON.parse(shop.dataset.products || '[]');
+        const productsEl = document.getElementById('shop-products');
+        products = JSON.parse(productsEl ? productsEl.textContent : (shop.dataset.products || '[]'));
+        if (!Array.isArray(products)) products = [];
     } catch (e) {
         products = [];
     }
@@ -51,7 +53,19 @@
     }
 
     function findProduct(id) {
-        return products.find((p) => p.id === id);
+        const numId = Number(id);
+        const fromList = products.find((p) => Number(p.id) === numId);
+        if (fromList) return fromList;
+        const btn = document.querySelector('[data-wishlist="' + numId + '"]');
+        if (!btn) return null;
+        return {
+            id: numId,
+            name: btn.dataset.name || 'Product',
+            price: parseFloat(btn.dataset.price || '0'),
+            unit: btn.dataset.unit || '',
+            emoji: btn.dataset.emoji || '🌱',
+            image: btn.dataset.image || '',
+        };
     }
 
     function getCartCount(cart) {
@@ -84,11 +98,11 @@
     }
 
     function closeCart() {
-        cartOverlay.classList.remove('is-open');
-        cartDrawer.classList.remove('is-open');
+        cartOverlay?.classList.remove('is-open');
+        cartDrawer?.classList.remove('is-open');
         setTimeout(() => {
-            cartOverlay.hidden = true;
-            cartDrawer.hidden = true;
+            if (cartOverlay) cartOverlay.hidden = true;
+            if (cartDrawer) cartDrawer.hidden = true;
         }, 300);
         if (!wishlistDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open')) {
             document.body.style.overflow = '';
@@ -150,6 +164,7 @@
     }
 
     function renderCart() {
+        if (!cartCount || !cartItems) return;
         const cart = getCart();
         const count = getCartCount(cart);
         const total = getCartTotal(cart);
@@ -158,15 +173,15 @@
         cartCount.dataset.count = count;
 
         if (count === 0) {
-            cartEmpty.hidden = false;
-            cartFooter.hidden = true;
+            if (cartEmpty) cartEmpty.hidden = false;
+            if (cartFooter) cartFooter.hidden = true;
             cartItems.querySelectorAll('.cart-item').forEach((el) => el.remove());
             return;
         }
 
-        cartEmpty.hidden = true;
-        cartFooter.hidden = false;
-        cartTotal.textContent = currency + total.toLocaleString('en-IN');
+        if (cartEmpty) cartEmpty.hidden = true;
+        if (cartFooter) cartFooter.hidden = false;
+        if (cartTotal) cartTotal.textContent = currency + total.toLocaleString('en-IN');
 
         // Backfill image URLs for older cart entries (saved before image support)
         let shouldResave = false;
@@ -338,7 +353,7 @@
     function renderSearchDrop() {
         if (!searchResults || !searchInput) return;
         const q = searchQuery();
-        searchClear.hidden = !q;
+        if (searchClear) searchClear.hidden = !q;
         if (!q) {
             closeSearchDrop();
             applyProductFilters();
@@ -488,15 +503,22 @@
 
     // Wishlist (saved in localStorage) — header heart, not cart
     const WISH_KEY = 'seeds_bazar_wishlist';
+    function saveWishlist(ids) {
+        try {
+            localStorage.setItem(WISH_KEY, JSON.stringify(ids));
+        } catch (e) {
+            showToast('Could not save wishlist in this browser');
+        }
+    }
     function getWishlist() {
         try {
-            return JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
+            const raw = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
+            if (!Array.isArray(raw)) return [];
+            return raw.map((item) => Number(typeof item === 'object' && item ? item.id : item))
+                .filter((id) => !Number.isNaN(id));
         } catch {
             return [];
         }
-    }
-    function saveWishlist(ids) {
-        localStorage.setItem(WISH_KEY, JSON.stringify(ids));
     }
     function openWishlist() {
         closeCart();
@@ -614,14 +636,20 @@
         openCart();
     }
 
-    document.querySelectorAll('[data-wishlist]').forEach((btn) => {
-        btn.addEventListener('click', (e) => {
+    shop.addEventListener('click', (e) => {
+        const heart = e.target.closest('[data-wishlist]');
+        if (heart) {
             e.preventDefault();
             e.stopPropagation();
-            toggleWishlist(parseInt(btn.dataset.wishlist, 10));
-        });
+            const id = parseInt(heart.dataset.wishlist, 10);
+            if (!Number.isNaN(id)) toggleWishlist(id);
+            return;
+        }
+        if (e.target.closest('#wishlist-toggle')) {
+            e.preventDefault();
+            openWishlist();
+        }
     });
-    wishlistToggle?.addEventListener('click', openWishlist);
     wishlistClose?.addEventListener('click', () => closeWishlist());
     wishlistOverlay?.addEventListener('click', () => closeWishlist());
     btnClearWishlist?.addEventListener('click', () => {

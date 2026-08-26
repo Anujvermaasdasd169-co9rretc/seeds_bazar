@@ -11,13 +11,15 @@ use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $categories = Category::withCount('products')
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.categories.index', compact('categories'));
+        $editingId = (int) $request->query('edit');
+
+        return view('admin.categories.index', compact('categories', 'editingId'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -42,6 +44,31 @@ class CategoryController extends Controller
         ]);
 
         return back()->with('success', 'Category added.');
+    }
+
+    public function update(Request $request, Category $category): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+        ]);
+
+        $slug = Str::slug($validated['name']);
+        $baseSlug = $slug !== '' ? $slug : 'category';
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (Category::where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
+            $slug = $baseSlug.'-'.$counter++;
+        }
+
+        $category->update([
+            'name' => $validated['name'],
+            'slug' => $slug,
+        ]);
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Category updated.');
     }
 
     public function toggle(Category $category): RedirectResponse

@@ -858,7 +858,7 @@ body {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    z-index: 2;
+    z-index: 8;
     width: 36px;
     height: 36px;
     border: none;

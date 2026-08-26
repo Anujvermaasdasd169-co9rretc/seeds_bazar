@@ -26,6 +26,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', AdminProductController::class)->except(['show']);
         Route::get('categories', [AdminCategoryController::class, 'index'])->name('categories.index');
         Route::post('categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+        Route::patch('categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
         Route::patch('categories/{category}/toggle', [AdminCategoryController::class, 'toggle'])->name('categories.toggle');
         Route::delete('categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
         Route::get('settings/logo', [SettingController::class, 'edit'])->name('settings.edit');

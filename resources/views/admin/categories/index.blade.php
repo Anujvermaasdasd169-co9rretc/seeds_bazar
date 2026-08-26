@@ -33,7 +33,19 @@
         <tbody>
             @forelse ($categories as $category)
                 <tr>
-                    <td><strong>{{ $category->name }}</strong></td>
+                    <td>
+                        @if ($editingId === $category->id)
+                            <form method="POST" action="{{ route('admin.categories.update', $category) }}" class="inline-add-form">
+                                @csrf
+                                @method('PATCH')
+                                <input type="text" name="name" value="{{ old('name', $category->name) }}" required maxlength="100" autofocus>
+                                <button type="submit" class="btn btn--sm btn--primary">Save</button>
+                                <a href="{{ route('admin.categories.index') }}" class="btn btn--sm btn--outline">Cancel</a>
+                            </form>
+                        @else
+                            <strong>{{ $category->name }}</strong>
+                        @endif
+                    </td>
                     <td><code>{{ $category->slug }}</code></td>
                     <td>{{ $category->products_count }}</td>
                     <td>
@@ -44,6 +56,15 @@
                         @endif
                     </td>
                     <td class="cell-actions">
+                        <a href="{{ route('admin.categories.index', ['edit' => $category->id]) }}"
+                           class="icon-btn"
+                           title="Edit category"
+                           aria-label="Edit {{ $category->name }}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M12 20h9"/>
+                                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                            </svg>
+                        </a>
                         <form method="POST" action="{{ route('admin.categories.toggle', $category) }}" class="inline-form">
                             @csrf
                             @method('PATCH')
