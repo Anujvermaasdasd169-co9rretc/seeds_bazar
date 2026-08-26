@@ -69,17 +69,47 @@
                             @csrf
                             @method('PATCH')
                             @if ($category->is_active)
-                                <button type="submit" class="btn btn--sm btn--outline">Set Inactive</button>
+                                <button type="submit" class="icon-btn" title="Set inactive" aria-label="Set {{ $category->name }} inactive">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5 0-9.27-3.11-11-8 1.02-2.87 2.9-5.17 5.21-6.61"/>
+                                        <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.11 11 8a11.8 11.8 0 0 1-2.16 3.19"/>
+                                        <path d="M1 1l22 22"/>
+                                        <path d="M14.12 14.12a3 3 0 0 1-4.24-4.24"/>
+                                    </svg>
+                                </button>
                             @else
-                                <button type="submit" class="btn btn--sm btn--primary">Set Active</button>
+                                <button type="submit" class="icon-btn icon-btn--success" title="Set active" aria-label="Set {{ $category->name }} active">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
                             @endif
                         </form>
                         @if ($category->products_count === 0)
                             <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" class="inline-form" onsubmit="return confirm('Delete this category?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn--sm btn--danger">Delete</button>
+                                <button type="submit" class="icon-btn icon-btn--danger" title="Delete category" aria-label="Delete {{ $category->name }}">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M3 6h18"/>
+                                        <path d="M8 6V4h8v2"/>
+                                        <path d="M6 6l1 16h10l1-16"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                    </svg>
+                                </button>
                             </form>
+                        @else
+                            <span class="icon-btn icon-btn--danger is-disabled" title="Cannot delete: category has products" aria-disabled="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M3 6h18"/>
+                                    <path d="M8 6V4h8v2"/>
+                                    <path d="M6 6l1 16h10l1-16"/>
+                                    <path d="M10 11v6"/>
+                                    <path d="M14 11v6"/>
+                                </svg>
+                            </span>
                         @endif
                     </td>
                 </tr>

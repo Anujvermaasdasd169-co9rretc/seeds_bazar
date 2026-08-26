@@ -373,6 +373,16 @@ code { font-size: 0.8rem; background: #f0f0f0; padding: 0.15rem 0.4rem; border-r
     background: rgba(240, 250, 244, 0.9);
 }
 
+.icon-btn--success {
+    color: var(--green-700);
+    background: #e9f7ef;
+    border-color: rgba(45, 106, 79, 0.22);
+}
+
+.icon-btn--success:hover {
+    background: #d8f3dc;
+}
+
 .icon-btn--danger {
     color: var(--danger);
     background: #fff2f2;
@@ -381,6 +391,13 @@ code { font-size: 0.8rem; background: #f0f0f0; padding: 0.15rem 0.4rem; border-r
 
 .icon-btn--danger:hover {
     background: #ffe5e7;
+}
+
+.icon-btn.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    pointer-events: none;
 }
 
 .admin-toolbar {
