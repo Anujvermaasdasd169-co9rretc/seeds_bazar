@@ -14,8 +14,35 @@
                 <x-site-logo class="logo__icon" />
             </a>
 
+            <div class="header-search" id="header-search">
+                <div class="header-search__box">
+                    <svg class="header-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="M20 20l-3.2-3.2"/>
+                    </svg>
+                    <input type="search"
+                           id="global-search"
+                           class="header-search__input"
+                           placeholder="Search seeds, plants &amp; more…"
+                           autocomplete="off"
+                           spellcheck="false"
+                           aria-label="Search products"
+                           aria-controls="search-results"
+                           aria-expanded="false">
+                    <kbd class="header-search__hint">/</kbd>
+                    <button type="button" class="header-search__clear" id="search-clear" hidden aria-label="Clear search">&times;</button>
+                </div>
+                <div class="header-search__drop" id="search-results" hidden role="listbox" aria-label="Search results"></div>
+            </div>
+
             <div class="header-actions">
                 <button type="button" class="header-link" id="contact-open">Contact Us</button>
+                <button type="button" class="cart-toggle cart-toggle--wish" id="wishlist-toggle" aria-label="Open wishlist">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span class="cart-toggle__badge" id="wishlist-count">0</span>
+                </button>
                 <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -101,7 +128,7 @@
                 $badge = $badges[$product['id'] % count($badges)];
                 $badgeClass = ($product['id'] % 4 === 3) ? 'product-badge--gold' : '';
             @endphp
-            <article class="product-card" data-category="{{ $product['category'] }}" data-id="{{ $product['id'] }}">
+            <article class="product-card" data-category="{{ $product['category'] }}" data-id="{{ $product['id'] }}" data-name="{{ $product['name'] }}">
                 <div class="product-card__top">
                     <span class="product-badge {{ $badgeClass }}">{{ $badge }}</span>
                     <button type="button"
@@ -113,7 +140,7 @@
                             data-unit="{{ $product['unit'] }}"
                             data-emoji="{{ $product['emoji'] }}"
                             data-image="{{ $product['image'] ?? '' }}"
-                            aria-label="Add to cart">
+                            aria-label="Add to wishlist">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
@@ -159,6 +186,7 @@
             </article>
         @endforeach
     </main>
+    <p class="products-empty" id="products-empty" hidden>No products match your search.</p>
 
     <footer class="footer">
         <div class="footer__inner">
@@ -227,6 +255,22 @@
                 Purchase on WhatsApp
             </button>
             <button type="button" class="btn btn--ghost" id="btn-clear-cart">Clear Cart</button>
+        </div>
+    </aside>
+
+    {{-- Wishlist drawer --}}
+    <div class="cart-overlay" id="wishlist-overlay" hidden></div>
+    <aside class="cart-drawer" id="wishlist-drawer" aria-label="Wishlist" hidden>
+        <div class="cart-drawer__header">
+            <h2>Your Wishlist</h2>
+            <button type="button" class="cart-drawer__close" id="wishlist-close" aria-label="Close wishlist">&times;</button>
+        </div>
+        <div class="cart-drawer__items" id="wishlist-items">
+            <p class="cart-empty" id="wishlist-empty">Your wishlist is empty. Tap the heart on a product.</p>
+        </div>
+        <div class="cart-drawer__footer" id="wishlist-footer" hidden>
+            <button type="button" class="btn btn--cart-full" id="btn-wishlist-to-cart">Move all to cart</button>
+            <button type="button" class="btn btn--ghost" id="btn-clear-wishlist">Clear Wishlist</button>
         </div>
     </aside>
 
