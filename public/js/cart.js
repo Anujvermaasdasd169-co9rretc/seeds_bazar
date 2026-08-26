@@ -342,14 +342,20 @@
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const id = parseInt(btn.dataset.wishlist, 10);
+            const id = parseInt(btn.dataset.id || btn.dataset.wishlist, 10);
+            addToCart(
+                id,
+                btn.dataset.name,
+                parseFloat(btn.dataset.price),
+                btn.dataset.unit,
+                btn.dataset.emoji,
+                btn.dataset.image || '',
+            );
             let ids = getWishlist();
-            if (ids.includes(id)) {
-                ids = ids.filter((i) => i !== id);
-            } else {
+            if (!ids.includes(id)) {
                 ids.push(id);
+                saveWishlist(ids);
             }
-            saveWishlist(ids);
             syncWishlistUi();
         });
     });

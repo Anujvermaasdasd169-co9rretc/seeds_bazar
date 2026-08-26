@@ -10,13 +10,17 @@
 
     <header class="header">
         <div class="header__inner">
-            <a href="{{ route('shop.index') }}" class="logo">
+            {{-- <a href="{{ route('shop.index') }}" class="logo">
                 <x-site-logo class="logo__icon" />
-                <span class="logo__text">
-                    <strong>Seed Planta</strong>
-                    <small>{{ $tagline }}</small>
-                </span>
+            </a> --}}
+
+            <a href="{{ route('shop.index') }}" class="logo">
+                <x-site-logo 
+                    class="logo__icon"
+                    style="width: 180px; height: 60px; object-fit: contain; display: block; border: 1px solid #ddd; border-radius: 4px; padding: 5px; background: #fff;"
+                />
             </a>
+
             <div class="header-actions">
                 <button type="button" class="header-link" id="contact-open">Contact Us</button>
                 <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
@@ -107,7 +111,16 @@
             <article class="product-card" data-category="{{ $product['category'] }}" data-id="{{ $product['id'] }}">
                 <div class="product-card__top">
                     <span class="product-badge {{ $badgeClass }}">{{ $badge }}</span>
-                    <button type="button" class="wishlist-btn" data-wishlist="{{ $product['id'] }}" aria-label="Add to wishlist">
+                    <button type="button"
+                            class="wishlist-btn"
+                            data-wishlist="{{ $product['id'] }}"
+                            data-id="{{ $product['id'] }}"
+                            data-name="{{ $product['name'] }}"
+                            data-price="{{ $product['price'] }}"
+                            data-unit="{{ $product['unit'] }}"
+                            data-emoji="{{ $product['emoji'] }}"
+                            data-image="{{ $product['image'] ?? '' }}"
+                            aria-label="Add to cart">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
@@ -180,7 +193,7 @@
                 <button type="button" class="footer__text-btn" id="contact-open-footer">Contact Us</button>
                 <a href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds. Please share availability & price list.') }}"
                    target="_blank" rel="noopener noreferrer">WhatsApp order</a>
-                <a href="{{ route('admin.login') }}">Admin login</a>
+                {{-- <a href="{{ route('admin.login') }}">Admin login</a> --}}
             </div>
 
             <div class="footer__col footer__col--cta">
