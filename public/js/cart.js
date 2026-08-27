@@ -294,6 +294,8 @@
     const searchResults = document.getElementById('search-results');
     const productsEmpty = document.getElementById('products-empty');
     const searchBox = searchInput?.closest('.header-search__box');
+    const productsGrid = document.getElementById('products-grid');
+    const viewAllProducts = document.getElementById('view-all-products');
     let searchActiveIndex = -1;
 
     function activeCategory() {
@@ -436,6 +438,11 @@
         btn.addEventListener('click', () => {
             setCategoryFilter(btn.dataset.category, false);
         });
+    });
+
+    viewAllProducts?.addEventListener('click', () => {
+        productsGrid?.classList.remove('products-grid--collapsed');
+        viewAllProducts.closest('.products-more')?.remove();
     });
 
     document.getElementById('nav-home')?.addEventListener('click', (e) => {

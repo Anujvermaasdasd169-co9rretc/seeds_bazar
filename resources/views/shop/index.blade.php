@@ -134,7 +134,7 @@
         @endforeach
     </nav>
 
-    <main class="products-grid" id="products-grid">
+    <main class="products-grid products-grid--collapsed" id="products-grid">
         @foreach (is_iterable($products) ? $products : [] as $product)
             @php
                 $mrp = (int) ceil($product['price'] * 1.4);
@@ -205,6 +205,11 @@
             </article>
         @endforeach
     </main>
+    @if (count($products) > 8)
+        <div class="products-more">
+            <button type="button" class="products-more__button" id="view-all-products">View all products</button>
+        </div>
+    @endif
     <p class="products-empty" id="products-empty" hidden>No products match your search.</p>
 
     <section class="reviews-section" id="reviews" aria-labelledby="reviews-title">
