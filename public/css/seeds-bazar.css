@@ -233,7 +233,7 @@ body {
     align-items: center;
     gap: 0.4rem;
     height: 40px;
-    padding: 0 0.7rem 0 0.95rem;
+    padding: 0 0.95rem 0 0.7rem;
     border-radius: 999px;
     background:
         linear-gradient(var(--white), var(--white)) padding-box,
@@ -252,6 +252,7 @@ body {
 
 .header-search__icon {
     flex-shrink: 0;
+    order: 2;
     color: var(--green-600);
 }
 
@@ -275,7 +276,7 @@ body {
 .header-search__marquee {
     position: absolute;
     left: 2.8rem;
-    right: 0.7rem;
+    right: 2.8rem;
     overflow: hidden;
     color: #8aa196;
     font-size: 0.95rem;
@@ -283,6 +284,10 @@ body {
     line-height: 1;
     white-space: nowrap;
     pointer-events: none;
+}
+
+.header-search__marquee > span {
+    display: inline-block;
     animation: searchPlaceholderMarquee 8s linear infinite;
 }
 

@@ -34,10 +34,6 @@
 
             <div class="header-search" id="header-search">
                 <div class="header-search__box">
-                    <svg class="header-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="M20 20l-3.2-3.2"/>
-                    </svg>
                     <input type="search"
                            id="global-search"
                            class="header-search__input"
@@ -47,7 +43,11 @@
                            aria-label="Search products"
                            aria-controls="search-results"
                            aria-expanded="false">
-                          <span class="header-search__marquee" aria-hidden="true">Search seeds, plants &amp; more…</span>
+                        <span class="header-search__marquee" aria-hidden="true"><span>Search seeds, plants &amp; more…</span></span>
+                        <svg class="header-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="M20 20l-3.2-3.2"/>
+                        </svg>
                     {{-- <kbd class="header-search__hint"></kbd> --}}
                     <button type="button" class="header-search__clear" id="search-clear" hidden aria-label="Clear search">&times;</button>
                 </div>
