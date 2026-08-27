@@ -14,7 +14,7 @@
     <aside class="admin-sidebar">
         <a href="{{ route('admin.dashboard') }}" class="admin-brand">
             <x-site-logo class="admin-brand__logo" />
-            <span>Seed Planta</span>
+            {{-- <span>Seed Planta</span> --}}
         </a>
         <nav class="admin-nav">
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">Dashboard</a>
