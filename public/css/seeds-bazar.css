@@ -94,10 +94,8 @@ body {
 
 .logo__icon.site-logo__img,
 .site-logo__img.logo__icon {
-    /* height: 58px; */
     width: auto;
-    /* max-width: 240px; */
-    max-height: 64px;
+    max-height: 69px;
     object-fit: contain;
     object-position: left center;
     padding: 0;
