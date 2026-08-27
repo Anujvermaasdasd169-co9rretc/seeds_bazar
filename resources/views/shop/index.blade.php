@@ -25,7 +25,7 @@
                     </button>
                     <div class="header-nav__drop" id="seeds-drop" hidden>
                         <button type="button" class="header-nav__drop-item" data-nav-category="all">All Seeds</button>
-                        @foreach ($categories as $key => $label)
+                        @foreach (is_iterable($categories) ? $categories : [] as $key => $label)
                             <button type="button" class="header-nav__drop-item" data-nav-category="{{ $key }}">{{ $label }}</button>
                         @endforeach
                     </div>
@@ -129,20 +129,20 @@
 
     <nav class="filters" aria-label="Product categories">
         <button type="button" class="filter-btn is-active" data-category="all">All</button>
-        @foreach ($categories as $key => $label)
+        @foreach (is_iterable($categories) ? $categories : [] as $key => $label)
             <button type="button" class="filter-btn" data-category="{{ $key }}">{{ $label }}</button>
         @endforeach
     </nav>
 
     <main class="products-grid" id="products-grid">
-        @foreach ($products as $product)
+        @foreach (is_iterable($products) ? $products : [] as $product)
             @php
                 $mrp = (int) ceil($product['price'] * 1.4);
                 $discount = $mrp > $product['price']
                     ? (int) round((($mrp - $product['price']) / $mrp) * 100)
                     : 0;
-                $rating = number_format(4.3 + ($product['id'] % 7) * 0.1, 1);
-                $reviews = 40 + ($product['id'] * 47) % 280;
+                $rating = $product['review_rating'] ? number_format($product['review_rating'], 1) : 'New';
+                $reviews = $product['review_count'];
                 $badges = ['Best Seller', 'Trending', 'Fresh Stock', 'Top Rated'];
                 $badge = $badges[$product['id'] % count($badges)];
                 $badgeClass = ($product['id'] % 4 === 3) ? 'product-badge--gold' : '';
@@ -173,8 +173,8 @@
                     <span class="product-card__category">{{ $product['category_name'] ?? ($categories[$product['category']] ?? '') }}</span>
                     <h2 class="product-card__name" title="{{ $product['name'] }}">{{ $product['name'] }}</h2>
                     <div class="product-card__rating">
-                        <span class="stars" aria-hidden="true">★★★★★</span>
-                        <span class="product-card__rating-text">{{ $rating }} | {{ $reviews }}</span>
+                        <span class="stars" aria-hidden="true">{{ $product['review_rating'] ? '★★★★★' : '☆☆☆☆☆' }}</span>
+                        <span class="product-card__rating-text">{{ $rating }}{{ $reviews ? ' | '.$reviews : '' }}</span>
                     </div>
                     <p class="product-card__unit-line">{{ $product['unit'] }}</p>
                     <div class="product-card__pricing">
@@ -207,6 +207,68 @@
     </main>
     <p class="products-empty" id="products-empty" hidden>No products match your search.</p>
 
+    <section class="reviews-section" id="reviews" aria-labelledby="reviews-title">
+        <div class="reviews-section__intro">
+            <span class="section-eyebrow">Customer feedback</span>
+            <h2 id="reviews-title">Share your experience</h2>
+            <p>Tell other growers which seeds worked well for you.</p>
+        </div>
+
+        @if (session('review_success'))
+            <p class="review-alert review-alert--success">{{ session('review_success') }}</p>
+        @endif
+
+        <form method="POST" action="{{ route('reviews.store') }}" class="review-form">
+            @csrf
+            <label class="review-field">
+                <span>Product</span>
+                <select name="product_id" required>
+                    <option value="">Choose a product</option>
+                    @foreach (is_iterable($products) ? $products : [] as $product)
+                        <option value="{{ $product['id'] }}" @selected(old('product_id') == $product['id'])>{{ $product['name'] }}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label class="review-field">
+                <span>Your name</span>
+                <input type="text" name="name" value="{{ old('name') }}" maxlength="100" required>
+            </label>
+            <label class="review-field">
+                <span>Rating</span>
+                <select name="rating" required>
+                    <option value="">Choose rating</option>
+                    @for ($rating = 5; $rating >= 1; $rating--)
+                        <option value="{{ $rating }}" @selected(old('rating') == $rating)>{{ $rating }} / 5</option>
+                    @endfor
+                </select>
+            </label>
+            <label class="review-field review-field--wide">
+                <span>Your review</span>
+                <textarea name="comment" rows="3" maxlength="1000" required>{{ old('comment') }}</textarea>
+            </label>
+            <button type="submit" class="review-submit">Submit review</button>
+        </form>
+
+        @if ($errors->any())
+            <p class="review-alert review-alert--error">{{ $errors->first() }}</p>
+        @endif
+
+        <div class="reviews-list">
+            @forelse (is_iterable($reviews) ? $reviews : [] as $review)
+                <article class="review-item">
+                    <div class="review-item__top">
+                        <strong>{{ $review->name }}</strong>
+                        <span class="review-item__rating" aria-label="{{ $review->rating }} out of 5 stars">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</span>
+                    </div>
+                    <p class="review-item__product">{{ $review->product->name }}</p>
+                    <p>{{ $review->comment }}</p>
+                </article>
+            @empty
+                <p class="reviews-empty">No reviews yet. Be the first to share your experience.</p>
+            @endforelse
+        </div>
+    </section>
+
     <footer class="footer">
         <div class="footer__inner">
             <div class="footer__brand">
@@ -223,7 +285,7 @@
             <div class="footer__col">
                 <h3>Shop</h3>
                 <a href="#products-grid">All products</a>
-                @foreach ($categories as $label)
+                @foreach (is_iterable($categories) ? $categories : [] as $label)
                     <a href="#products-grid">{{ $label }}</a>
                 @endforeach
             </div>
