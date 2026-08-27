@@ -293,6 +293,7 @@
     const searchClear = document.getElementById('search-clear');
     const searchResults = document.getElementById('search-results');
     const productsEmpty = document.getElementById('products-empty');
+    const searchBox = searchInput?.closest('.header-search__box');
     let searchActiveIndex = -1;
 
     function activeCategory() {
@@ -454,12 +455,16 @@
         closeSeedsMenu();
     });
 
-    searchInput?.addEventListener('input', renderSearchDrop);
+    searchInput?.addEventListener('input', () => {
+        searchBox?.classList.toggle('has-value', Boolean(searchInput.value));
+        renderSearchDrop();
+    });
     searchInput?.addEventListener('focus', () => {
         if (searchQuery()) renderSearchDrop();
     });
     searchClear?.addEventListener('click', () => {
         if (searchInput) searchInput.value = '';
+        searchBox?.classList.remove('has-value');
         closeSearchDrop();
         applyProductFilters();
         searchInput?.focus();

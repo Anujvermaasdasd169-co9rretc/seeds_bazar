@@ -47,6 +47,7 @@
                            aria-label="Search products"
                            aria-controls="search-results"
                            aria-expanded="false">
+                          <span class="header-search__marquee" aria-hidden="true">Search seeds, plants &amp; more…</span>
                     {{-- <kbd class="header-search__hint"></kbd> --}}
                     <button type="button" class="header-search__clear" id="search-clear" hidden aria-label="Clear search">&times;</button>
                 </div>
