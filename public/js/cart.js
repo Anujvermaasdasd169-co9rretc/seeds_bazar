@@ -561,6 +561,7 @@
             closeCart();
             closeWishlist();
             closeContact();
+            closeProductDetail();
         }
     });
 
@@ -713,6 +714,12 @@
         if (e.target.closest('#wishlist-toggle')) {
             e.preventDefault();
             openWishlist();
+            return;
+        }
+        const detailBtn = e.target.closest('[data-product-detail]');
+        if (detailBtn) {
+            e.preventDefault();
+            openProductDetail(parseInt(detailBtn.dataset.productDetail, 10));
         }
     });
     wishlistClose?.addEventListener('click', () => closeWishlist());
@@ -730,6 +737,126 @@
         else if (remove) removeFromWishlist(parseInt(remove.dataset.id, 10));
     });
     renderWishlist();
+
+    // Product details popup
+    const productOverlay = document.getElementById('product-overlay');
+    const productModal = document.getElementById('product-modal');
+    const productClose = document.getElementById('product-close');
+    let productDetailQty = 1;
+    let productDetailId = null;
+
+    function starsHtml(rating) {
+        const n = Math.round(Number(rating) || 0);
+        return '★'.repeat(Math.max(0, Math.min(5, n))) + '☆'.repeat(Math.max(0, 5 - n));
+    }
+
+    function closeProductDetail() {
+        if (!productOverlay || !productModal) return;
+        productOverlay.classList.remove('is-open');
+        productModal.classList.remove('is-open');
+        if (!cartDrawer?.classList.contains('is-open') && !wishlistDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open')) {
+            document.body.style.overflow = '';
+        }
+        setTimeout(() => {
+            productOverlay.hidden = true;
+            productModal.hidden = true;
+        }, 220);
+    }
+
+    function openProductDetail(id) {
+        const product = findProduct(id);
+        if (!product || !productOverlay || !productModal) return;
+        productDetailId = Number(product.id);
+        productDetailQty = 1;
+        const mrp = Math.ceil(Number(product.price) * 1.4);
+        const discount = mrp > product.price ? Math.round(((mrp - product.price) / mrp) * 100) : 0;
+        const media = document.getElementById('pd-media');
+        const cat = document.getElementById('pd-cat');
+        const name = document.getElementById('pd-name');
+        const rating = document.getElementById('pd-rating');
+        const unit = document.getElementById('pd-unit');
+        const price = document.getElementById('pd-price');
+        const desc = document.getElementById('pd-desc');
+        const qtyEl = document.getElementById('pd-qty');
+        const reviewsEl = document.getElementById('pd-reviews');
+
+        if (media) {
+            media.innerHTML = product.image
+                ? `<img src="${escapeAttr(product.image)}" alt="${escapeAttr(product.name)}">`
+                : `<span class="product-modal__emoji">${escapeHtml(product.emoji || '🌱')}</span>`;
+        }
+        if (cat) cat.textContent = product.category_name || product.category || '';
+        if (name) name.textContent = product.name || '';
+        if (unit) unit.textContent = product.unit || '';
+        if (qtyEl) qtyEl.textContent = String(productDetailQty);
+        if (price) {
+            price.innerHTML = `<strong>${currency}${Number(product.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>`
+                + (discount > 0
+                    ? `<span>${currency}${mrp.toLocaleString('en-IN')}</span><em>-${discount}% Off</em>`
+                    : '');
+        }
+        if (desc) {
+            desc.textContent = product.description || 'Premium quality seeds packed for strong germination and healthy crop growth.';
+        }
+        if (rating) {
+            if (product.review_rating) {
+                rating.innerHTML = `<span class="stars">${starsHtml(product.review_rating)}</span> ${escapeHtml(String(product.review_rating))} | ${product.review_count || 0} reviews`;
+            } else {
+                rating.innerHTML = '<span class="stars">☆☆☆☆☆</span> New product';
+            }
+        }
+        if (reviewsEl) {
+            const list = Array.isArray(product.reviews) ? product.reviews : [];
+            if (!list.length) {
+                reviewsEl.innerHTML = '<p class="product-modal__no-reviews">No reviews yet for this product.</p>';
+            } else {
+                reviewsEl.innerHTML = '<h3>Customer reviews</h3>' + list.map((r) => `
+                    <article class="product-modal__review">
+                        <strong>${escapeHtml(r.name || 'Customer')}</strong>
+                        <span class="stars">${starsHtml(r.rating)}</span>
+                        <p>${escapeHtml(r.comment || '')}</p>
+                    </article>
+                `).join('');
+            }
+        }
+
+        productOverlay.hidden = false;
+        productModal.hidden = false;
+        requestAnimationFrame(() => {
+            productOverlay.classList.add('is-open');
+            productModal.classList.add('is-open');
+        });
+        document.body.style.overflow = 'hidden';
+    }
+
+    document.getElementById('pd-qty-minus')?.addEventListener('click', () => {
+        productDetailQty = Math.max(1, productDetailQty - 1);
+        const qtyEl = document.getElementById('pd-qty');
+        if (qtyEl) qtyEl.textContent = String(productDetailQty);
+    });
+    document.getElementById('pd-qty-plus')?.addEventListener('click', () => {
+        productDetailQty += 1;
+        const qtyEl = document.getElementById('pd-qty');
+        if (qtyEl) qtyEl.textContent = String(productDetailQty);
+    });
+    document.getElementById('pd-add-cart')?.addEventListener('click', () => {
+        const product = findProduct(productDetailId);
+        if (!product) return;
+        for (let i = 0; i < productDetailQty; i += 1) {
+            addToCart(
+                Number(product.id),
+                product.name,
+                parseFloat(product.price),
+                product.unit || '',
+                product.emoji || '🌱',
+                product.image || '',
+                i < productDetailQty - 1,
+            );
+        }
+        closeProductDetail();
+    });
+    productClose?.addEventListener('click', closeProductDetail);
+    productOverlay?.addEventListener('click', closeProductDetail);
 
     // Contact modal (popup)
     const contactOpen = document.getElementById('contact-open');

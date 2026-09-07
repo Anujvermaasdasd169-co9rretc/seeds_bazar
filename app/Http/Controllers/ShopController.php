@@ -36,6 +36,16 @@ class ShopController extends Controller
                 'review_rating' => $product->reviews->count()
                     ? round($product->reviews->avg('rating'), 1)
                     : null,
+                'reviews' => $product->reviews
+                    ->sortByDesc('created_at')
+                    ->take(4)
+                    ->map(fn ($review) => [
+                        'name' => $review->name,
+                        'rating' => (int) $review->rating,
+                        'comment' => $review->comment,
+                    ])
+                    ->values()
+                    ->all(),
             ]);
 
         $categoryLabels = $categories->pluck('name', 'slug')->all();

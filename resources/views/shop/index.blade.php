@@ -164,10 +164,15 @@
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
                     </button>
-                    <x-product-visual
-                        :image="$product['image'] ?? null"
-                        :emoji="$product['emoji'] ?? '🌱'"
-                    />
+                    <button type="button"
+                            class="product-card__open"
+                            data-product-detail="{{ $product['id'] }}"
+                            aria-label="View details for {{ $product['name'] }}">
+                        <x-product-visual
+                            :image="$product['image'] ?? null"
+                            :emoji="$product['emoji'] ?? '🌱'"
+                        />
+                    </button>
                 </div>
                 <div class="product-card__body">
                     <span class="product-card__category">{{ $product['category_name'] ?? ($categories[$product['category']] ?? '') }}</span>
@@ -359,6 +364,37 @@
             <button type="button" class="btn btn--ghost" id="btn-clear-wishlist">Clear Wishlist</button>
         </div>
     </aside>
+
+    {{-- Product details popup --}}
+    <div class="product-overlay" id="product-overlay" hidden></div>
+    <div class="product-modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="pd-name" hidden>
+        <button type="button" class="product-modal__close" id="product-close" aria-label="Close details">&times;</button>
+        <div class="product-modal__grid">
+            <div class="product-modal__media" id="pd-media"></div>
+            <div class="product-modal__info">
+                <span class="product-modal__cat" id="pd-cat"></span>
+                <h2 id="pd-name"></h2>
+                <div class="product-modal__rating" id="pd-rating"></div>
+                <p class="product-modal__unit" id="pd-unit"></p>
+                <div class="product-modal__price" id="pd-price"></div>
+                <p class="product-modal__desc" id="pd-desc"></p>
+                <ul class="product-modal__points">
+                    <li>High germination quality seeds</li>
+                    <li>Packed fresh for your climate</li>
+                    <li>Easy WhatsApp order &amp; dispatch</li>
+                </ul>
+                <div class="product-modal__buy">
+                    <div class="cart-qty product-modal__qty">
+                        <button type="button" class="cart-qty__btn" id="pd-qty-minus" aria-label="Decrease quantity">−</button>
+                        <span class="cart-qty__value" id="pd-qty">1</span>
+                        <button type="button" class="cart-qty__btn" id="pd-qty-plus" aria-label="Increase quantity">+</button>
+                    </div>
+                    <button type="button" class="btn btn--cart-full" id="pd-add-cart">Add to Cart</button>
+                </div>
+                <div class="product-modal__reviews" id="pd-reviews"></div>
+            </div>
+        </div>
+    </div>
 
     {{-- Contact popup --}}
     <div class="modal-overlay" id="contact-overlay" hidden></div>
