@@ -313,9 +313,8 @@
     const viewAllProducts = document.getElementById('view-all-products');
     let searchActiveIndex = -1;
 
-<<<<<<< HEAD
     let currentCategory = shop.dataset.activeCategory || 'all';
-=======
+
     // Keep the banner controls independent from product filtering.
     const heroSlider = document.getElementById('hero-slider');
     if (heroSlider) {
@@ -363,7 +362,6 @@
         showSlide(0);
         startAutoplay();
     }
->>>>>>> 1143b706a5dc2adf56f4579925547641e2abe92b
 
     function activeCategory() {
         return currentCategory || 'all';

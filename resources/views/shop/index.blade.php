@@ -20,60 +20,7 @@
 
     <x-storefront-header :nav-categories="$navCategories" :storefront="$storefront" />
 
-<<<<<<< HEAD
     @unless ($activeCategory)
-    <section class="hero">
-        <div class="hero__bg" aria-hidden="true"></div>
-        <div class="hero__inner">
-            <div class="hero__content">
-                <div class="hero__kicker">
-                    <span class="hero__pill">Trusted seeds</span>
-                    <span class="hero__pill hero__pill--light">Fast WhatsApp order</span>
-                </div>
-
-                <h1>
-                    Grow your next
-                    <span class="hero__highlight">best harvest</span>
-                </h1>
-                <div class="hero-marquee" aria-label="Message">
-                    <div class="hero-marquee__track">
-                        <p class="hero-marquee__text">
-                            Premium vegetable, fruit, flower & grain seeds — order via WhatsApp in one click.
-                        </p>
-
-                    </div>
-                </div>
-
-                <div class="hero__actions">
-                    <a class="hero-btn hero-btn--primary" href="#products-grid">
-                        Shop now
-                        <span aria-hidden="true">→</span>
-                    </a>
-                    <a class="hero-btn hero-btn--ghost"
-                       href="https://wa.me/{{ preg_replace('/\\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds. Please share availability & price list.') }}"
-                       target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                    </a>
-                </div>
-
-             
-            </div>
-
-            <div class="hero__art" aria-hidden="true">
-                <div class="hero__card hero__card--one">
-                    <span class="hero__card-emoji">🌿</span>
-                    <span class="hero__card-text">High germination</span>
-                </div>
-                <div class="hero__card hero__card--two">
-                    <span class="hero__card-emoji">🌱</span>
-                    <span class="hero__card-text">Premium quality</span>
-                </div>
-                <div class="hero__card hero__card--three">
-                    <span class="hero__card-emoji">🚚</span>
-                    <span class="hero__card-text">Quick dispatch</span>
-                </div>
-            </div>
-=======
     <section class="hero-slider" id="hero-slider" aria-label="Seed Planta highlights">
         <div class="hero-slider__track">
             <article class="hero-slide is-active" data-slide="0">
@@ -88,7 +35,6 @@
                 <img src="{{ asset('banner/banner3.png') }}" alt="Colourful flowering plants in a garden nursery" loading="lazy">
                 <div class="hero-slide__shade"></div>
             </article>
->>>>>>> 1143b706a5dc2adf56f4579925547641e2abe92b
         </div>
         <div class="hero-slider__controls">
             <button type="button" class="hero-slider__arrow" data-slider-prev aria-label="Previous banner">←</button>
