@@ -107,8 +107,8 @@ class CategoryMenuTest extends TestCase
 
         $this->get(route('shop.index'))
             ->assertOk()
-            ->assertSee('Seeds')
-            ->assertDontSee('Seeds Collection');
+            ->assertSee('data-nav-category="seeds"', false)
+            ->assertSee('>Seeds</span>', false);
 
         $this->get(route('shop.category', $seeds))
             ->assertOk()

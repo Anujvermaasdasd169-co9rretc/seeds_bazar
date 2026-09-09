@@ -20,6 +20,7 @@
 
     <x-storefront-header :nav-categories="$navCategories" :storefront="$storefront" />
 
+<<<<<<< HEAD
     @unless ($activeCategory)
     <section class="hero">
         <div class="hero__bg" aria-hidden="true"></div>
@@ -72,16 +73,33 @@
                     <span class="hero__card-text">Quick dispatch</span>
                 </div>
             </div>
+=======
+    <section class="hero-slider" id="hero-slider" aria-label="Seed Planta highlights">
+        <div class="hero-slider__track">
+            <article class="hero-slide is-active" data-slide="0">
+                <img src="{{ asset('banner/banner1.png') }}" alt="A productive garden filled with vegetables and plants" fetchpriority="high">
+                <div class="hero-slide__shade"></div>
+            </article>
+            <article class="hero-slide" data-slide="1" aria-hidden="true">
+                <img src="{{ asset('banner/banner2.png') }}" alt="Fresh fruit growing in a bright garden" loading="lazy">
+                <div class="hero-slide__shade"></div>
+            </article>
+            <article class="hero-slide" data-slide="2" aria-hidden="true">
+                <img src="{{ asset('banner/banner3.png') }}" alt="Colourful flowering plants in a garden nursery" loading="lazy">
+                <div class="hero-slide__shade"></div>
+            </article>
+>>>>>>> 1143b706a5dc2adf56f4579925547641e2abe92b
         </div>
-    </section>
-
-    <section class="trust-strip" aria-label="Why shop with Seed Planta">
-        <div class="trust-strip__inner">
-            <div class="trust-strip__item"><span aria-hidden="true">✓</span><p><strong>Quality checked</strong><small>Seeds selected for reliable growth</small></p></div>
-            <div class="trust-strip__item"><span aria-hidden="true">✦</span><p><strong>Fresh lots</strong><small>Stored carefully for better viability</small></p></div>
-            <div class="trust-strip__item"><span aria-hidden="true">⌂</span><p><strong>For every garden</strong><small>From balcony pots to farm plots</small></p></div>
-            <div class="trust-strip__item"><span aria-hidden="true">↗</span><p><strong>Grower support</strong><small>Ask us before you sow</small></p></div>
+        <div class="hero-slider__controls">
+            <button type="button" class="hero-slider__arrow" data-slider-prev aria-label="Previous banner">←</button>
+            <div class="hero-slider__dots" role="tablist" aria-label="Choose a banner">
+                <button type="button" class="hero-slider__dot is-active" data-slider-dot="0" role="tab" aria-label="Show banner 1" aria-selected="true"></button>
+                <button type="button" class="hero-slider__dot" data-slider-dot="1" role="tab" aria-label="Show banner 2" aria-selected="false"></button>
+                <button type="button" class="hero-slider__dot" data-slider-dot="2" role="tab" aria-label="Show banner 3" aria-selected="false"></button>
+            </div>
+            <button type="button" class="hero-slider__arrow" data-slider-next aria-label="Next banner">→</button>
         </div>
+        <div class="hero-slider__progress" aria-hidden="true"><span></span></div>
     </section>
 
     @if (($homeCategories ?? collect())->isNotEmpty())
@@ -236,7 +254,7 @@
             <button type="button" class="products-more__button" id="view-all-products">View all products</button>
         </div>
     @endif
-    <p class="products-empty" id="products-empty" @hidden(count($products) > 0)>{{ $activeCategory ? 'No products in this category yet.' : 'No products match your search.' }}</p>
+    <p class="products-empty" id="products-empty" @if (count($products) > 0) hidden @endif>{{ $activeCategory ? 'No products in this category yet.' : 'No products match your search.' }}</p>
 
     @unless ($activeCategory)
     <section class="grower-guide" id="grower-guide" aria-labelledby="guide-title">
