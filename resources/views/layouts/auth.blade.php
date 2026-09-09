@@ -14,5 +14,6 @@
         <a class="auth-brand" href="{{ route('shop.index') }}">Seed Planta</a>
         @yield('content')
     </main>
+    @stack('scripts')
 </body>
 </html>

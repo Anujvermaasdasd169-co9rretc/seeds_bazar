@@ -37,17 +37,18 @@
 @endsection
 @push('scripts')
 <script>
-    const cart = JSON.parse(localStorage.getItem('seeds_bazar_cart') || '[]').map(item => ({ id: Number(item.id), quantity: Number(item.quantity) }));
+    const cart = JSON.parse(localStorage.getItem('seeds_bazar_cart') || '[]').map(item => ({ id: Number(item.id), quantity: Number(item.quantity) })).filter(item => item.id && item.quantity > 0);
     const csrf = document.querySelector('input[name="_token"]')?.value;
     const address = document.getElementById('address_id');
+    const cartInput = document.getElementById('checkout-cart');
     const quoteUrl = @json(route('checkout.quote'));
-    document.getElementById('checkout-cart')?.setAttribute('value', JSON.stringify(cart));
+    if (cartInput) cartInput.value = JSON.stringify(cart);
     const items = document.getElementById('checkout-items');
-    if (items) items.innerHTML = cart.length ? `<strong>${cart.reduce((total, item) => total + item.quantity, 0)} item(s) in your order</strong>` : '<p>Your cart is empty.</p>';
+    if (items) items.innerHTML = cart.length ? `<strong>${cart.reduce((total, item) => total + item.quantity, 0)} item(s) in your order</strong>` : '<p>Your cart is empty. Add seeds from the shop before placing an order.</p>';
     async function refreshQuote() {
         const summary = document.getElementById('checkout-summary');
-        if (!summary || !cart.length || !address?.value) return;
-        const response = await fetch(quoteUrl, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf}, body: JSON.stringify({address_id: address.value, cart})});
+        if (!summary || !cart.length || !address?.value) { if (summary) summary.hidden = true; return; }
+        const response = await fetch(quoteUrl, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf}, body: JSON.stringify({address_id: Number(address.value), cart})});
         if (!response.ok) { summary.hidden = true; return; }
         const quote = await response.json();
         summary.hidden = false;
@@ -59,6 +60,7 @@
     address?.addEventListener('change', refreshQuote);
     refreshQuote();
     document.getElementById('checkout-form')?.addEventListener('submit', (event) => {
+        if (cartInput) cartInput.value = JSON.stringify(cart);
         if (!cart.length) { event.preventDefault(); alert('Your cart is empty.'); }
     });
 </script>

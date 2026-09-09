@@ -50,6 +50,7 @@
 .address-default { display: inline-block; margin-left: .35rem; padding: .15rem .4rem; border-radius: 999px; background: var(--green-100); color: var(--green-800); font-size: .7rem; }
 .checkout-items { margin: 1rem 0; padding: .85rem; border-radius: 8px; background: var(--green-50); color: var(--green-900); }
 .checkout-summary { display: grid; gap: .5rem; margin: 1rem 0; padding: .9rem; border: 1px solid rgba(45, 106, 79, .15); border-radius: 8px; }
+.checkout-summary[hidden] { display: none; }
 .checkout-summary div { display: flex; justify-content: space-between; gap: 1rem; color: var(--text-muted); }
 .checkout-summary div:last-child { padding-top: .5rem; border-top: 1px solid rgba(45, 106, 79, .12); color: var(--green-900); }
 .order-summary { display: flex; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-block: 1px solid rgba(45, 106, 79, .12); color: var(--text-muted); }
