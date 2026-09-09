@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +22,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('login', fn ($request) => [
+            Limit::perMinute(5)->by(strtolower((string) $request->input('email')).'|'.$request->ip()),
+        ]);
+        RateLimiter::for('password-reset', fn ($request) => [
+            Limit::perMinute(3)->by(strtolower((string) $request->input('email')).'|'.$request->ip()),
+        ]);
+        RateLimiter::for('password-change', fn ($request) => [
+            Limit::perMinute(5)->by((string) $request->user()?->getAuthIdentifier().'|'.$request->ip()),
+        ]);
+        RateLimiter::for('verification', fn ($request) => [
+            Limit::perMinute(3)->by((string) $request->user()?->getAuthIdentifier().'|'.$request->ip()),
+        ]);
+        RateLimiter::for('reviews', fn ($request) => [
+            Limit::perMinute(5)->by((string) $request->user()?->getAuthIdentifier().'|'.$request->ip()),
+        ]);
+
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }

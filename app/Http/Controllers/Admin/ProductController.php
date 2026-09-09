@@ -8,7 +8,6 @@ use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -103,7 +102,15 @@ class ProductController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'sowing_season' => ['nullable', 'string', 'max:100'],
+            'sunlight' => ['nullable', 'string', 'max:100'],
+            'germination_days' => ['nullable', 'string', 'max:100'],
+            'harvest_days' => ['nullable', 'string', 'max:100'],
+            'plant_spacing' => ['nullable', 'string', 'max:100'],
+            'sowing_depth' => ['nullable', 'string', 'max:100'],
+            'growing_difficulty' => ['nullable', 'string', 'max:50'],
             'price' => ['required', 'numeric', 'min:0'],
+            'stock_quantity' => ['required', 'integer', 'min:0', 'max:4294967295'],
             'unit' => ['required', 'string', 'max:100'],
             'emoji' => ['nullable', 'string', 'max:16'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif'],

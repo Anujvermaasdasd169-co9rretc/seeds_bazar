@@ -5,7 +5,8 @@
 @section('content')
 <div class="shop" id="shop-app"
      data-whatsapp="{{ $whatsappNumber }}"
-     data-currency="{{ $currency }}">
+    data-currency="{{ $currency }}"
+    data-shipping-estimate="{{ $shippingEstimate }}">
     <script type="application/json" id="shop-products">@json($products)</script>
 
     <header class="header">
@@ -16,6 +17,7 @@
 
             <nav class="header-nav" aria-label="Main">
                 <a href="{{ route('shop.index') }}" class="header-nav__link" id="nav-home">Home</a>
+                <a href="#grower-guide" class="header-nav__link">Growing guide</a>
                 <div class="header-nav__item" id="seeds-menu">
                     <button type="button" class="header-nav__link header-nav__link--btn" id="seeds-toggle" aria-expanded="false" aria-controls="seeds-drop">
                         Seeds
@@ -127,12 +129,49 @@
         </div>
     </section>
 
+    <section class="trust-strip" aria-label="Why shop with Seed Planta">
+        <div class="trust-strip__inner">
+            <div class="trust-strip__item"><span aria-hidden="true">✓</span><p><strong>Quality checked</strong><small>Seeds selected for reliable growth</small></p></div>
+            <div class="trust-strip__item"><span aria-hidden="true">✦</span><p><strong>Fresh lots</strong><small>Stored carefully for better viability</small></p></div>
+            <div class="trust-strip__item"><span aria-hidden="true">⌂</span><p><strong>For every garden</strong><small>From balcony pots to farm plots</small></p></div>
+            <div class="trust-strip__item"><span aria-hidden="true">↗</span><p><strong>Grower support</strong><small>Ask us before you sow</small></p></div>
+        </div>
+    </section>
+
+    <section class="market-intro" aria-labelledby="market-title">
+        <div>
+            <span class="section-eyebrow">The seed marketplace</span>
+            <h2 id="market-title">Pick a season. Start something beautiful.</h2>
+        </div>
+        <p>Thoughtfully chosen seeds for kitchen gardens, flowering balconies, and productive fields—packed in practical quantities and ready to grow.</p>
+    </section>
+
+    <section class="collection-rail" aria-label="Shop by garden goal">
+        <a href="#products-grid" class="collection-card collection-card--kitchen" data-category-link="vegetables">
+            <span>01</span><strong>Kitchen garden</strong><small>Everyday harvests, close to home</small><b>Explore vegetables →</b>
+        </a>
+        <a href="#products-grid" class="collection-card collection-card--bloom" data-category-link="flowers">
+            <span>02</span><strong>Bloom &amp; brighten</strong><small>Colour for borders, pots, and pollinators</small><b>Explore flowers →</b>
+        </a>
+        <a href="#products-grid" class="collection-card collection-card--field" data-category-link="grains">
+            <span>03</span><strong>Field essentials</strong><small>Dependable varieties for larger growing</small><b>Explore grains →</b>
+        </a>
+    </section>
+
     <nav class="filters" aria-label="Product categories">
         <button type="button" class="filter-btn is-active" data-category="all">All</button>
         @foreach (is_iterable($categories) ? $categories : [] as $key => $label)
             <button type="button" class="filter-btn" data-category="{{ $key }}">{{ $label }}</button>
         @endforeach
     </nav>
+
+    <div class="catalog-heading">
+        <div>
+            <span class="section-eyebrow">Fresh picks</span>
+            <h2>Seeds worth growing</h2>
+        </div>
+        <p>Browse by category, search a variety, or open any pack for more detail.</p>
+    </div>
 
     <main class="products-grid products-grid--collapsed" id="products-grid">
         @foreach (is_iterable($products) ? $products : [] as $product)
@@ -156,6 +195,7 @@
                             data-id="{{ $product['id'] }}"
                             data-name="{{ $product['name'] }}"
                             data-price="{{ $product['price'] }}"
+                            data-stock="{{ $product['stock_quantity'] }}"
                             data-unit="{{ $product['unit'] }}"
                             data-emoji="{{ $product['emoji'] }}"
                             data-image="{{ $product['image'] ?? '' }}"
@@ -176,7 +216,7 @@
                 </div>
                 <div class="product-card__body">
                     <span class="product-card__category">{{ $product['category_name'] ?? ($categories[$product['category']] ?? '') }}</span>
-                    <h2 class="product-card__name" title="{{ $product['name'] }}">{{ $product['name'] }}</h2>
+                    <h2 class="product-card__name" title="{{ $product['name'] }}"><a href="{{ route('products.show', $product['id']) }}">{{ $product['name'] }}</a></h2>
                     <div class="product-card__rating">
                         <span class="stars" aria-hidden="true">{{ $product['review_rating'] ? '★★★★★' : '☆☆☆☆☆' }}</span>
                         <span class="product-card__rating-text">{{ $rating }}{{ $reviews ? ' | '.$reviews : '' }}</span>
@@ -191,20 +231,22 @@
                             @endif
                         </div>
                     </div>
-                    <button type="button"
+                        <button type="button"
                             class="btn btn--cart-full"
                             data-add-to-cart
                             data-id="{{ $product['id'] }}"
                             data-name="{{ $product['name'] }}"
                             data-price="{{ $product['price'] }}"
+                            data-stock="{{ $product['stock_quantity'] }}"
                             data-unit="{{ $product['unit'] }}"
                             data-emoji="{{ $product['emoji'] }}"
-                            data-image="{{ $product['image'] ?? '' }}">
+                            data-image="{{ $product['image'] ?? '' }}"
+                            @disabled(! $product['in_stock'])>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                         </svg>
-                        Add to Cart
+                        {{ $product['in_stock'] ? 'Add to Cart' : 'Out of stock' }}
                     </button>
                 </div>
             </article>
@@ -216,6 +258,32 @@
         </div>
     @endif
     <p class="products-empty" id="products-empty" hidden>No products match your search.</p>
+
+    <section class="grower-guide" id="grower-guide" aria-labelledby="guide-title">
+        <div class="grower-guide__intro">
+            <span class="section-eyebrow">Grow with confidence</span>
+            <h2 id="guide-title">A good harvest starts before planting.</h2>
+            <p>Keep these simple habits close and your seeds will have the best possible start.</p>
+            <a href="{{ route('contact.show') }}" class="text-link">Need help choosing a variety? Talk to a grower →</a>
+        </div>
+        <ol class="grower-steps">
+            <li><span>01</span><h3>Read the season</h3><p>Match your variety to local weather, sunlight, and the space you have.</p></li>
+            <li><span>02</span><h3>Prepare gently</h3><p>Use loose, clean growing medium and water until evenly moist—not wet.</p></li>
+            <li><span>03</span><h3>Sow with patience</h3><p>Give seedlings warmth, light, and time. Consistency matters more than overwatering.</p></li>
+        </ol>
+    </section>
+
+    <section class="faq-section" aria-labelledby="faq-title">
+        <div class="faq-section__intro">
+            <span class="section-eyebrow">Before you order</span>
+            <h2 id="faq-title">A few useful answers.</h2>
+        </div>
+        <div class="faq-list">
+            <details open><summary>How do I choose the right seed pack?</summary><p>Start with your available sunlight, space, and growing season. Each product quick-view shows its pack size and basics; contact us if you would like a recommendation.</p></details>
+            <details><summary>When will my order be dispatched?</summary><p>Orders are prepared after confirmation. The checkout flow shows the current delivery estimate before you place an order.</p></details>
+            <details><summary>Can I order through WhatsApp?</summary><p>Yes. Add products to your cart and use the WhatsApp order button, or message us directly for availability and guidance.</p></details>
+        </div>
+    </section>
 
     <section class="reviews-section" id="reviews" aria-labelledby="reviews-title">
         <div class="reviews-section__intro">
@@ -303,6 +371,8 @@
             <div class="footer__col">
                 <h3>Help</h3>
                 <button type="button" class="footer__text-btn" id="contact-open-footer">Contact Us</button>
+                <a href="{{ route('policies.shipping') }}">Shipping &amp; delivery</a>
+                <a href="{{ route('policies.returns') }}">Returns &amp; refunds</a>
                 <a href="https://wa.me/{{ preg_replace('/\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds. Please share availability & price list.') }}"
                    target="_blank" rel="noopener noreferrer">WhatsApp order</a>
                 {{-- <a href="{{ route('admin.login') }}">Admin login</a> --}}
@@ -320,7 +390,7 @@
         </div>
         <div class="footer__bottom">
             <p>&copy; {{ date('Y') }} Seed Planta. All rights reserved.</p>
-            <p>Orders are confirmed on WhatsApp</p>
+            <p><a href="{{ route('policies.privacy') }}">Privacy</a> · <a href="{{ route('policies.terms') }}">Terms</a></p>
         </div>
     </footer>
 
@@ -345,6 +415,7 @@
                 </svg>
                 Purchase on WhatsApp
             </button>
+            <a href="{{ route('checkout') }}" class="btn btn--cart-full">Checkout</a>
             <button type="button" class="btn btn--ghost" id="btn-clear-cart">Clear Cart</button>
         </div>
     </aside>
@@ -369,14 +440,19 @@
     <div class="product-overlay" id="product-overlay" hidden></div>
     <div class="product-modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="pd-name" hidden>
         <button type="button" class="product-modal__close" id="product-close" aria-label="Close details">&times;</button>
+    <div class="product-modal__toolbar">
+        <button type="button" class="product-modal__tool" id="pd-wishlist" aria-label="Add product to wishlist">♡</button>
+        <button type="button" class="product-modal__tool" id="pd-share" aria-label="Share product">↗</button>
+    </div>
         <div class="product-modal__grid">
             <div class="product-modal__media" id="pd-media"></div>
             <div class="product-modal__info">
                 <span class="product-modal__cat" id="pd-cat"></span>
                 <h2 id="pd-name"></h2>
                 <div class="product-modal__rating" id="pd-rating"></div>
-                <p class="product-modal__unit" id="pd-unit"></p>
+                <div class="product-modal__facts"><span id="pd-unit"></span><span id="pd-stock"></span></div>
                 <div class="product-modal__price" id="pd-price"></div>
+                <div class="product-modal__delivery"><strong>Standard Delivery</strong><span id="pd-delivery"></span></div>
                 <p class="product-modal__desc" id="pd-desc"></p>
                 <ul class="product-modal__points">
                     <li>High germination quality seeds</li>

@@ -14,7 +14,15 @@ class Product extends Model
         'category_id',
         'name',
         'description',
+        'sowing_season',
+        'sunlight',
+        'germination_days',
+        'harvest_days',
+        'plant_spacing',
+        'sowing_depth',
+        'growing_difficulty',
         'price',
+        'stock_quantity',
         'unit',
         'emoji',
         'image',
@@ -27,6 +35,7 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
+            'stock_quantity' => 'integer',
             'is_active' => 'boolean',
         ];
     }

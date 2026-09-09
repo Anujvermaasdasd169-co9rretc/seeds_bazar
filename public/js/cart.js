@@ -126,9 +126,16 @@
 
     function addToCart(id, name, price, unit, emoji, image, silent) {
         const cart = getCart();
+        const product = findProduct(id);
+        const stock = Number(product?.stock_quantity ?? 0);
         const existing = cart.find((item) => item.id === id);
+        const nextQuantity = (existing?.quantity || 0) + 1;
+        if (stock < nextQuantity) {
+            showToast(stock > 0 ? `Only ${stock} available` : 'This product is out of stock');
+            return false;
+        }
         if (existing) {
-            existing.quantity += 1;
+            existing.quantity = nextQuantity;
         } else {
             cart.push({ id, name, price, unit, emoji, image: image || '', quantity: 1 });
         }
@@ -137,13 +144,21 @@
         if (!silent) {
             showToast(`${name} added to cart`);
         }
+        return true;
     }
 
     function updateQuantity(id, delta) {
         const cart = getCart();
         const item = cart.find((i) => i.id === id);
         if (!item) return;
-        item.quantity += delta;
+        const product = findProduct(id);
+        const stock = Number(product?.stock_quantity ?? 0);
+        const nextQuantity = item.quantity + delta;
+        if (nextQuantity > stock) {
+            showToast(stock > 0 ? `Only ${stock} available` : 'This product is out of stock');
+            return;
+        }
+        item.quantity = nextQuantity;
         if (item.quantity <= 0) {
             saveCart(cart.filter((i) => i.id !== id));
         } else {
@@ -440,6 +455,12 @@
         });
     });
 
+    document.querySelectorAll('[data-category-link]').forEach((link) => {
+        link.addEventListener('click', () => {
+            setCategoryFilter(link.dataset.categoryLink);
+        });
+    });
+
     viewAllProducts?.addEventListener('click', () => {
         productsGrid?.classList.remove('products-grid--collapsed');
         viewAllProducts.closest('.products-more')?.remove();
@@ -520,7 +541,7 @@
     document.querySelectorAll('[data-add-to-cart]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id, 10);
-            addToCart(
+            const added = addToCart(
                 id,
                 btn.dataset.name,
                 parseFloat(btn.dataset.price),
@@ -528,6 +549,7 @@
                 btn.dataset.emoji,
                 btn.dataset.image || '',
             );
+            if (!added) return;
             btn.classList.add('added');
             const originalHtml = btn.innerHTML;
             btn.innerHTML = btn.querySelector('svg')
@@ -742,6 +764,8 @@
     const productOverlay = document.getElementById('product-overlay');
     const productModal = document.getElementById('product-modal');
     const productClose = document.getElementById('product-close');
+    const productWishlist = document.getElementById('pd-wishlist');
+    const productShare = document.getElementById('pd-share');
     let productDetailQty = 1;
     let productDetailId = null;
 
@@ -777,6 +801,9 @@
         const unit = document.getElementById('pd-unit');
         const price = document.getElementById('pd-price');
         const desc = document.getElementById('pd-desc');
+        const stock = document.getElementById('pd-stock');
+        const delivery = document.getElementById('pd-delivery');
+        const addButton = document.getElementById('pd-add-cart');
         const qtyEl = document.getElementById('pd-qty');
         const reviewsEl = document.getElementById('pd-reviews');
 
@@ -788,6 +815,21 @@
         if (cat) cat.textContent = product.category_name || product.category || '';
         if (name) name.textContent = product.name || '';
         if (unit) unit.textContent = product.unit || '';
+        if (stock) {
+            const available = Number(product.stock_quantity || 0);
+            stock.textContent = available > 0 ? `${available} available` : 'Out of stock';
+            stock.className = available > 0 ? 'product-modal__stock product-modal__stock--in' : 'product-modal__stock product-modal__stock--out';
+        }
+        if (delivery) delivery.textContent = shop.dataset.shippingEstimate || '5-7 business days';
+        if (productWishlist) {
+            productWishlist.textContent = getWishlist().includes(Number(product.id)) ? '♥' : '♡';
+            productWishlist.setAttribute('aria-label', getWishlist().includes(Number(product.id)) ? 'Remove from wishlist' : 'Add product to wishlist');
+        }
+        if (addButton) {
+            const available = Number(product.stock_quantity || 0);
+            addButton.disabled = available < 1;
+            addButton.textContent = available > 0 ? 'Add to Cart' : 'Out of stock';
+        }
         if (qtyEl) qtyEl.textContent = String(productDetailQty);
         if (price) {
             price.innerHTML = `<strong>${currency}${Number(product.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>`
@@ -835,6 +877,11 @@
         if (qtyEl) qtyEl.textContent = String(productDetailQty);
     });
     document.getElementById('pd-qty-plus')?.addEventListener('click', () => {
+        const product = findProduct(productDetailId);
+        if (productDetailQty >= Number(product?.stock_quantity || 0)) {
+            showToast('No more stock available');
+            return;
+        }
         productDetailQty += 1;
         const qtyEl = document.getElementById('pd-qty');
         if (qtyEl) qtyEl.textContent = String(productDetailQty);
@@ -854,6 +901,26 @@
             );
         }
         closeProductDetail();
+    });
+    productWishlist?.addEventListener('click', () => {
+        if (productDetailId === null) return;
+        toggleWishlist(productDetailId);
+        const product = findProduct(productDetailId);
+        const active = getWishlist().includes(Number(productDetailId));
+        productWishlist.textContent = active ? '♥' : '♡';
+        productWishlist.setAttribute('aria-label', active ? 'Remove from wishlist' : 'Add product to wishlist');
+    });
+    productShare?.addEventListener('click', async () => {
+        const product = findProduct(productDetailId);
+        if (! product) return;
+        const shareData = {title: product.name, text: `Have a look at ${product.name} on Seed Planta.`};
+        try {
+            if (navigator.share) await navigator.share(shareData);
+            else await navigator.clipboard.writeText(`${product.name} - ${window.location.href}`);
+            showToast('Product link ready to share');
+        } catch (error) {
+            if (error?.name !== 'AbortError') showToast('Could not share this product');
+        }
     });
     productClose?.addEventListener('click', closeProductDetail);
     productOverlay?.addEventListener('click', closeProductDetail);

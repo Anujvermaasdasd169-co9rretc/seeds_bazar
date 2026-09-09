@@ -35,6 +35,7 @@
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
+                <th>Stock</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -55,6 +56,7 @@
                     </td>
                     <td>{{ $product->category->name }}</td>
                     <td>₹{{ number_format($product->price) }}</td>
+                    <td>{{ $product->stock_quantity }}</td>
                     <td>
                         @if ($product->is_active)
                             <span class="badge badge--green">Active</span>
@@ -73,7 +75,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="empty-cell">
+                    <td colspan="7" class="empty-cell">
                         @if ($categoryId)
                             No products in this category.
                         @else

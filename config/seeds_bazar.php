@@ -8,6 +8,14 @@ return [
 
     'tagline' => 'Quality seeds for your farm & garden',
 
+    'shipping' => [
+        'flat_rate' => (float) env('SHIPPING_FLAT_RATE', 79),
+        'free_threshold' => (float) env('FREE_SHIPPING_THRESHOLD', 999),
+        'estimate' => env('SHIPPING_ESTIMATE', '5-7 business days'),
+        'method' => env('SHIPPING_METHOD', 'Standard Delivery'),
+        'serviceable_pincodes' => env('SERVICEABLE_PINCODES', ''),
+    ],
+
     'categories' => [
         'vegetables' => 'Vegetables',
         'fruits' => 'Fruits',

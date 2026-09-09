@@ -46,6 +46,11 @@
     </label>
 
     <label class="form-field">
+        <span>Stock quantity *</span>
+        <input type="number" name="stock_quantity" value="{{ old('stock_quantity', $product?->stock_quantity ?? 0) }}" required min="0" max="4294967295" step="1">
+    </label>
+
+    <label class="form-field">
         <span>Unit *</span>
         <input type="text" name="unit" value="{{ old('unit', $product?->unit) }}" required maxlength="100" placeholder="50g pack">
     </label>
@@ -54,6 +59,19 @@
         <span>Description</span>
         <textarea name="description" rows="3" maxlength="1000">{{ old('description', $product?->description) }}</textarea>
     </label>
+
+    <div class="form-field form-field--full">
+        <span>Growing information <small class="field-hint">Shown automatically on the product detail page. Leave a field empty if it does not apply.</small></span>
+        <div class="form-grid" style="margin-top: .65rem;">
+            <label class="form-field"><span>Best sowing season</span><input type="text" name="sowing_season" value="{{ old('sowing_season', $product?->sowing_season) }}" maxlength="100" placeholder="July–September"></label>
+            <label class="form-field"><span>Sunlight</span><input type="text" name="sunlight" value="{{ old('sunlight', $product?->sunlight) }}" maxlength="100" placeholder="Full sun"></label>
+            <label class="form-field"><span>Germination</span><input type="text" name="germination_days" value="{{ old('germination_days', $product?->germination_days) }}" maxlength="100" placeholder="6–10 days"></label>
+            <label class="form-field"><span>First harvest</span><input type="text" name="harvest_days" value="{{ old('harvest_days', $product?->harvest_days) }}" maxlength="100" placeholder="60–75 days"></label>
+            <label class="form-field"><span>Plant spacing</span><input type="text" name="plant_spacing" value="{{ old('plant_spacing', $product?->plant_spacing) }}" maxlength="100" placeholder="45 cm apart"></label>
+            <label class="form-field"><span>Sowing depth</span><input type="text" name="sowing_depth" value="{{ old('sowing_depth', $product?->sowing_depth) }}" maxlength="100" placeholder="0.5 cm deep"></label>
+            <label class="form-field"><span>Difficulty</span><select name="growing_difficulty"><option value="">Select difficulty</option>@foreach (['Easy', 'Moderate', 'Advanced'] as $level)<option value="{{ $level }}" @selected(old('growing_difficulty', $product?->growing_difficulty) === $level)>{{ $level }}</option>@endforeach</select></label>
+        </div>
+    </div>
 
     <label class="form-field checkbox-field">
         <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product?->is_active ?? true))>
