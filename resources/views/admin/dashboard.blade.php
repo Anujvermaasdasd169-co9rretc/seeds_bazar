@@ -26,6 +26,13 @@
         </article>
         <article class="stat-card stat-card--mint">
             <span class="stat-card__icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12l2 4H4z"/><path d="M4 6h16v14H4z"/><path d="M9 11h6"/></svg>
+            </span>
+            <span class="stat-card__value">{{ $orderCount }}</span>
+            <span class="stat-card__label">Total Orders</span>
+        </article>
+        <article class="stat-card stat-card--mint">
+            <span class="stat-card__icon" aria-hidden="true">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </span>
             <span class="stat-card__value">{{ $activeCount }}</span>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\ContactMessage;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
@@ -15,6 +16,7 @@ class DashboardController extends Controller
     {
         return view('admin.dashboard', [
             'productCount' => Product::count(),
+            'orderCount' => Order::count(),
             'categoryCount' => Category::count(),
             'activeCount' => Product::where('is_active', true)->count(),
             'contactCount' => ContactMessage::count(),
