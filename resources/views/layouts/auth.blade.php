@@ -11,7 +11,7 @@
 </head>
 <body class="auth-shell">
     <main class="auth-panel">
-        <a class="auth-brand" href="{{ route('shop.index') }}">Seed Planta</a>
+        <a class="auth-brand" href="{{ route('shop.index') }}"><x-site-logo class="auth-brand__logo" /><span>Seed Planta</span></a>
         @yield('content')
     </main>
     @stack('scripts')
