@@ -5,6 +5,9 @@
     @foreach (['policies.shipping', 'policies.returns', 'policies.privacy', 'policies.terms'] as $policy)
         <url><loc>{{ route($policy) }}</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
     @endforeach
+    @foreach ($categories ?? [] as $category)
+        <url><loc>{{ route('shop.category', $category->slug) }}</loc><lastmod>{{ $category->updated_at->toAtomString() }}</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+    @endforeach
     @foreach ($products as $product)
         <url><loc>{{ route('products.show', $product) }}</loc><lastmod>{{ $product->updated_at->toAtomString() }}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
     @endforeach

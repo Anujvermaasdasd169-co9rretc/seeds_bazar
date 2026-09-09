@@ -19,6 +19,7 @@ use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/c/{category:slug}', [ShopController::class, 'index'])->name('shop.category');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/products/{product}', [ShopController::class, 'show'])->name('products.show');
 Route::post('/reviews', [ShopController::class, 'storeReview'])->middleware('throttle:reviews')->name('reviews.store');
@@ -80,6 +81,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('categories', [AdminCategoryController::class, 'store'])->name('categories.store');
         Route::patch('categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
         Route::patch('categories/{category}/toggle', [AdminCategoryController::class, 'toggle'])->name('categories.toggle');
+        Route::patch('categories/{category}/placement', [AdminCategoryController::class, 'togglePlacement'])->name('categories.placement');
+        Route::patch('categories/{category}/move', [AdminCategoryController::class, 'move'])->name('categories.move');
         Route::delete('categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
         Route::get('settings/logo', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');

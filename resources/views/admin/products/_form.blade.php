@@ -14,7 +14,7 @@
             <option value="">Select category</option>
             @foreach ($categories as $category)
                 <option value="{{ $category->id }}" @selected(old('category_id', $product?->category_id) == $category->id)>
-                    {{ $category->name }}
+                    {{ str_repeat('— ', max(0, (int) ($category->depth ?? 1) - 1)) }}{{ $category->name }}
                 </option>
             @endforeach
         </select>

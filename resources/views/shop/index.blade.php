@@ -1,80 +1,26 @@
 @extends('layouts.app')
 
-@section('title', 'Seed Planta — Buy Quality Seeds Online')
+@php
+    $storefront = $storefront ?? \App\Models\Setting::storefront();
+    $activeCategory = $activeCategory ?? null;
+    $childCategories = $childCategories ?? collect();
+@endphp
+
+@section('title', $activeCategory ? $activeCategory->displayName().' — Seed Planta' : 'Seed Planta — Buy Quality Seeds Online')
+@section('meta_description', $activeCategory?->description ?: 'Seed Planta — quality seeds for home gardens, farms, and growing spaces.')
 
 @section('content')
 <div class="shop" id="shop-app"
      data-whatsapp="{{ $whatsappNumber }}"
     data-currency="{{ $currency }}"
-    data-shipping-estimate="{{ $shippingEstimate }}">
+    data-shipping-estimate="{{ $shippingEstimate }}"
+    data-active-category="{{ $activeCategorySlug ?? 'all' }}"
+    data-page="{{ $activeCategory ? 'category' : 'home' }}">
     <script type="application/json" id="shop-products">@json($products)</script>
 
-    <header class="header">
-        <div class="header__inner">
-            <a href="{{ route('shop.index') }}" class="logo">
-                <x-site-logo class="logo__icon" />
-            </a>
+    <x-storefront-header :nav-categories="$navCategories" :storefront="$storefront" />
 
-            <nav class="header-nav" aria-label="Main">
-                <a href="{{ route('shop.index') }}" class="header-nav__link" id="nav-home">Home</a>
-                <a href="#grower-guide" class="header-nav__link">Growing guide</a>
-                <div class="header-nav__item" id="seeds-menu">
-                    <button type="button" class="header-nav__link header-nav__link--btn" id="seeds-toggle" aria-expanded="false" aria-controls="seeds-drop">
-                        Seeds
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
-                            <path d="M6 9l6 6 6-6"/>
-                        </svg>
-                    </button>
-                    <div class="header-nav__drop" id="seeds-drop" hidden>
-                        <button type="button" class="header-nav__drop-item" data-nav-category="all">All Seeds</button>
-                        @foreach (is_iterable($categories) ? $categories : [] as $key => $label)
-                            <button type="button" class="header-nav__drop-item" data-nav-category="{{ $key }}">{{ $label }}</button>
-                        @endforeach
-                    </div>
-                </div>
-            </nav>
-
-            <div class="header-search" id="header-search">
-                <div class="header-search__box">
-                    <input type="search"
-                           id="global-search"
-                           class="header-search__input"
-                           placeholder="Search seeds, plants &amp; more…"
-                           autocomplete="off"
-                           spellcheck="false"
-                           aria-label="Search products"
-                           aria-controls="search-results"
-                           aria-expanded="false">
-                        <span class="header-search__marquee" aria-hidden="true"><span>Search seeds, plants &amp; more…</span></span>
-                        <svg class="header-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                            <circle cx="11" cy="11" r="7"/>
-                            <path d="M20 20l-3.2-3.2"/>
-                        </svg>
-                    {{-- <kbd class="header-search__hint"></kbd> --}}
-                    <button type="button" class="header-search__clear" id="search-clear" hidden aria-label="Clear search">&times;</button>
-                </div>
-                <div class="header-search__drop" id="search-results" hidden role="listbox" aria-label="Search results"></div>
-            </div>
-
-            <div class="header-actions">
-                <button type="button" class="header-link" id="contact-open">Contact Us</button>
-                <button type="button" class="cart-toggle cart-toggle--wish" id="wishlist-toggle" aria-label="Open wishlist">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                    <span class="cart-toggle__badge" id="wishlist-count">0</span>
-                </button>
-                <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                    </svg>
-                    <span class="cart-toggle__badge" id="cart-count">0</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
+    @unless ($activeCategory)
     <section class="hero">
         <div class="hero__bg" aria-hidden="true"></div>
         <div class="hero__inner">
@@ -138,40 +84,73 @@
         </div>
     </section>
 
+    @if (($homeCategories ?? collect())->isNotEmpty())
     <section class="market-intro" aria-labelledby="market-title">
         <div>
-            <span class="section-eyebrow">The seed marketplace</span>
-            <h2 id="market-title">Pick a season. Start something beautiful.</h2>
+            <span class="section-eyebrow">{{ $storefront['top_eyebrow'] }}</span>
+            <h2 id="market-title">{{ $storefront['top_title'] }}</h2>
         </div>
-        <p>Thoughtfully chosen seeds for kitchen gardens, flowering balconies, and productive fields—packed in practical quantities and ready to grow.</p>
+        <p>{{ $storefront['top_intro'] }}</p>
     </section>
 
-    <section class="collection-rail" aria-label="Shop by garden goal">
-        <a href="#products-grid" class="collection-card collection-card--kitchen" data-category-link="vegetables">
-            <span>01</span><strong>Kitchen garden</strong><small>Everyday harvests, close to home</small><b>Explore vegetables →</b>
-        </a>
-        <a href="#products-grid" class="collection-card collection-card--bloom" data-category-link="flowers">
-            <span>02</span><strong>Bloom &amp; brighten</strong><small>Colour for borders, pots, and pollinators</small><b>Explore flowers →</b>
-        </a>
-        <a href="#products-grid" class="collection-card collection-card--field" data-category-link="grains">
-            <span>03</span><strong>Field essentials</strong><small>Dependable varieties for larger growing</small><b>Explore grains →</b>
-        </a>
+    <section class="collection-rail" aria-label="{{ $storefront['top_title'] }}">
+        @foreach ($homeCategories as $index => $homeCategory)
+            <a href="{{ route('shop.category', $homeCategory) }}"
+               class="collection-card collection-card--dynamic collection-card--tone-{{ $index % 6 }}"
+               @if ($homeCategory->image_url) style="background-image: linear-gradient(160deg, rgba(26,61,46,.55), rgba(26,61,46,.2)), url('{{ $homeCategory->image_url }}'); background-size: cover; background-position: center;" @endif>
+                <span>{{ $homeCategory->emoji ?: str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                <strong>{{ $homeCategory->displayName() }}</strong>
+                <small>{{ $homeCategory->description ?: implode(' / ', $homeCategory->pathNames()) }}</small>
+                <b>Explore {{ $homeCategory->displayName() }} →</b>
+            </a>
+        @endforeach
     </section>
+    @endif
+    @endunless
 
+    @if ($activeCategory)
+    <section class="category-hero" aria-labelledby="category-title">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="{{ route('shop.index') }}">Home</a>
+            @foreach ($activeCategory->pathCrumbs() as $crumb)
+                <span>/</span>
+                @if ($crumb->id === $activeCategory->id)
+                    <span aria-current="page">{{ $crumb->name }}</span>
+                @else
+                    <a href="{{ route('shop.category', $crumb) }}">{{ $crumb->name }}</a>
+                @endif
+            @endforeach
+        </nav>
+        <h1 id="category-title">{{ $activeCategory->name }}</h1>
+        @if ($activeCategory->description)
+            <p class="category-hero__desc">{{ $activeCategory->description }}</p>
+        @endif
+        @if ($childCategories->isNotEmpty())
+            <div class="category-children" aria-label="Sub-categories">
+                @foreach ($childCategories as $child)
+                    <a href="{{ route('shop.category', $child) }}" class="category-chip">{{ $child->emoji ? $child->emoji.' ' : '' }}{{ $child->displayName() }}</a>
+                @endforeach
+            </div>
+        @endif
+    </section>
+    @endif
+
+    @unless ($activeCategory)
     <nav class="filters" aria-label="Product categories">
         <button type="button" class="filter-btn is-active" data-category="all">All</button>
         @foreach (is_iterable($categories) ? $categories : [] as $key => $label)
-            <button type="button" class="filter-btn" data-category="{{ $key }}">{{ $label }}</button>
+            <a href="{{ route('shop.category', $key) }}" class="filter-btn">{{ $label }}</a>
         @endforeach
     </nav>
 
     <div class="catalog-heading">
         <div>
-            <span class="section-eyebrow">Fresh picks</span>
-            <h2>Seeds worth growing</h2>
+            <span class="section-eyebrow">{{ $storefront['catalog_eyebrow'] }}</span>
+            <h2>{{ $storefront['catalog_title'] }}</h2>
         </div>
-        <p>Browse by category, search a variety, or open any pack for more detail.</p>
+        <p>{{ $storefront['catalog_intro'] }}</p>
     </div>
+    @endunless
 
     <main class="products-grid products-grid--collapsed" id="products-grid">
         @foreach (is_iterable($products) ? $products : [] as $product)
@@ -186,7 +165,7 @@
                 $badge = $badges[$product['id'] % count($badges)];
                 $badgeClass = ($product['id'] % 4 === 3) ? 'product-badge--gold' : '';
             @endphp
-            <article class="product-card" data-category="{{ $product['category'] }}" data-id="{{ $product['id'] }}" data-name="{{ $product['name'] }}">
+            <article class="product-card" data-category="{{ $product['category'] }}" data-category-path="{{ implode(' ', $product['category_path'] ?? []) }}" data-id="{{ $product['id'] }}" data-name="{{ $product['name'] }}">
                 <div class="product-card__top">
                     <span class="product-badge {{ $badgeClass }}">{{ $badge }}</span>
                     <button type="button"
@@ -257,8 +236,9 @@
             <button type="button" class="products-more__button" id="view-all-products">View all products</button>
         </div>
     @endif
-    <p class="products-empty" id="products-empty" hidden>No products match your search.</p>
+    <p class="products-empty" id="products-empty" @hidden(count($products) > 0)>{{ $activeCategory ? 'No products in this category yet.' : 'No products match your search.' }}</p>
 
+    @unless ($activeCategory)
     <section class="grower-guide" id="grower-guide" aria-labelledby="guide-title">
         <div class="grower-guide__intro">
             <span class="section-eyebrow">Grow with confidence</span>
@@ -346,6 +326,7 @@
             @endforelse
         </div>
     </section>
+    @endunless
 
     <footer class="footer">
         <div class="footer__inner">
@@ -362,9 +343,9 @@
 
             <div class="footer__col">
                 <h3>Shop</h3>
-                <a href="#products-grid">All products</a>
-                @foreach (is_iterable($categories) ? $categories : [] as $label)
-                    <a href="#products-grid">{{ $label }}</a>
+                <a href="{{ route('shop.index') }}#products-grid">All products</a>
+                @foreach ($navCategories as $navCategory)
+                    <a href="{{ route('shop.category', $navCategory) }}">{{ $navCategory->displayName() }}</a>
                 @endforeach
             </div>
 
@@ -394,130 +375,7 @@
         </div>
     </footer>
 
-    {{-- Cart drawer --}}
-    <div class="cart-overlay" id="cart-overlay" hidden></div>
-    <aside class="cart-drawer" id="cart-drawer" aria-label="Shopping cart" hidden>
-        <div class="cart-drawer__header">
-            <h2>Your Cart</h2>
-            <button type="button" class="cart-drawer__close" id="cart-close" aria-label="Close cart">&times;</button>
-        </div>
-        <div class="cart-drawer__items" id="cart-items">
-            <p class="cart-empty" id="cart-empty">Your cart is empty. Add some seeds!</p>
-        </div>
-        <div class="cart-drawer__footer" id="cart-footer" hidden>
-            <div class="cart-total">
-                <span>Total</span>
-                <strong id="cart-total">{{ $currency }}0</strong>
-            </div>
-            <button type="button" class="btn btn--whatsapp" id="btn-purchase">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Purchase on WhatsApp
-            </button>
-            <a href="{{ route('checkout') }}" class="btn btn--cart-full">Checkout</a>
-            <button type="button" class="btn btn--ghost" id="btn-clear-cart">Clear Cart</button>
-        </div>
-    </aside>
-
-    {{-- Wishlist drawer --}}
-    <div class="cart-overlay" id="wishlist-overlay" hidden></div>
-    <aside class="cart-drawer" id="wishlist-drawer" aria-label="Wishlist" hidden>
-        <div class="cart-drawer__header">
-            <h2>Your Wishlist</h2>
-            <button type="button" class="cart-drawer__close" id="wishlist-close" aria-label="Close wishlist">&times;</button>
-        </div>
-        <div class="cart-drawer__items" id="wishlist-items">
-            <p class="cart-empty" id="wishlist-empty">Your wishlist is empty. Tap the heart on a product.</p>
-        </div>
-        <div class="cart-drawer__footer" id="wishlist-footer" hidden>
-            <button type="button" class="btn btn--cart-full" id="btn-wishlist-to-cart">Move all to cart</button>
-            <button type="button" class="btn btn--ghost" id="btn-clear-wishlist">Clear Wishlist</button>
-        </div>
-    </aside>
-
-    {{-- Product details popup --}}
-    <div class="product-overlay" id="product-overlay" hidden></div>
-    <div class="product-modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="pd-name" hidden>
-        <button type="button" class="product-modal__close" id="product-close" aria-label="Close details">&times;</button>
-    <div class="product-modal__toolbar">
-        <button type="button" class="product-modal__tool" id="pd-wishlist" aria-label="Add product to wishlist">♡</button>
-        <button type="button" class="product-modal__tool" id="pd-share" aria-label="Share product">↗</button>
-    </div>
-        <div class="product-modal__grid">
-            <div class="product-modal__media" id="pd-media"></div>
-            <div class="product-modal__info">
-                <span class="product-modal__cat" id="pd-cat"></span>
-                <h2 id="pd-name"></h2>
-                <div class="product-modal__rating" id="pd-rating"></div>
-                <div class="product-modal__facts"><span id="pd-unit"></span><span id="pd-stock"></span></div>
-                <div class="product-modal__price" id="pd-price"></div>
-                <div class="product-modal__delivery"><strong>Standard Delivery</strong><span id="pd-delivery"></span></div>
-                <p class="product-modal__desc" id="pd-desc"></p>
-                <ul class="product-modal__points">
-                    <li>High germination quality seeds</li>
-                    <li>Packed fresh for your climate</li>
-                    <li>Easy WhatsApp order &amp; dispatch</li>
-                </ul>
-                <div class="product-modal__buy">
-                    <div class="cart-qty product-modal__qty">
-                        <button type="button" class="cart-qty__btn" id="pd-qty-minus" aria-label="Decrease quantity">−</button>
-                        <span class="cart-qty__value" id="pd-qty">1</span>
-                        <button type="button" class="cart-qty__btn" id="pd-qty-plus" aria-label="Increase quantity">+</button>
-                    </div>
-                    <button type="button" class="btn btn--cart-full" id="pd-add-cart">Add to Cart</button>
-                </div>
-                <div class="product-modal__reviews" id="pd-reviews"></div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Contact popup --}}
-    <div class="modal-overlay" id="contact-overlay" hidden></div>
-    <div class="modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" hidden>
-        <div class="modal__header">
-            <div>
-                <h2 id="contact-title">Contact Us</h2>
-                <p class="modal__sub">Fill details — query is optional.</p>
-            </div>
-            <button type="button" class="modal__close" id="contact-close" aria-label="Close">&times;</button>
-        </div>
-
-        <div class="modal__body">
-            <div class="modal__alert modal__alert--success" id="contact-success" hidden></div>
-            <div class="modal__alert modal__alert--error" id="contact-error" hidden></div>
-
-            <form id="contact-form" method="POST" action="{{ route('contact.store', absolute: false) }}" class="modal-form" novalidate>
-                <div class="modal-grid">
-                    <label class="modal-field">
-                        <span>Name *</span>
-                        <input name="name" type="text" required maxlength="100" placeholder="Your name">
-                    </label>
-                    <label class="modal-field">
-                        <span>Mobile *</span>
-                        <input name="mobile" type="text" required maxlength="25" placeholder="Your mobile number">
-                    </label>
-                    <label class="modal-field modal-field--full">
-                        <span>Email *</span>
-                        <input name="email" type="email" required maxlength="255" placeholder="you@example.com">
-                    </label>
-                    <label class="modal-field modal-field--full">
-                        <span>Address *</span>
-                        <input name="address" type="text" required maxlength="255" placeholder="Your address">
-                    </label>
-                    <label class="modal-field modal-field--full">
-                        <span>Query (optional)</span>
-                        <textarea name="query" rows="3" maxlength="2000" placeholder="Write your message (optional)"></textarea>
-                    </label>
-                </div>
-
-                <div class="modal__actions">
-                    <span class="modal__note">Fields marked * are required.</span>
-                    <button type="submit" class="modal__submit">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <x-storefront-drawers :currency="$currency" />
 </div>
 @endsection
 

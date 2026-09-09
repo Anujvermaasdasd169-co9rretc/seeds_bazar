@@ -19,12 +19,17 @@ class ProductController extends Controller
             : null;
 
         $products = Product::with('category')
-            ->when($categoryId, fn ($query) => $query->where('category_id', $categoryId))
+            ->when($categoryId, function ($query) use ($categoryId) {
+                $category = Category::query()->with('children.children')->find($categoryId);
+                $ids = $category ? $category->descendantAndSelfIds() : [$categoryId];
+
+                return $query->whereIn('category_id', $ids);
+            })
             ->orderByDesc('created_at')
             ->paginate(8)
             ->withQueryString();
 
-        $categories = Category::orderBy('sort_order')->get();
+        $categories = Category::flattenedTree();
 
         return view('admin.products.index', compact('products', 'categories', 'categoryId'));
     }
@@ -32,7 +37,7 @@ class ProductController extends Controller
     public function create(): View
     {
         return view('admin.products.create', [
-            'categories' => Category::orderBy('sort_order')->get(),
+            'categories' => Category::flattenedTree(),
         ]);
     }
 
@@ -55,7 +60,7 @@ class ProductController extends Controller
     {
         return view('admin.products.edit', [
             'product' => $product,
-            'categories' => Category::orderBy('sort_order')->get(),
+            'categories' => Category::flattenedTree(),
         ]);
     }
 

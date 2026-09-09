@@ -21,6 +21,11 @@ class Setting extends Model
     /** @var array<string, ?string> */
     protected static array $cache = [];
 
+    public static function flushCache(): void
+    {
+        static::$cache = [];
+    }
+
     public static function get(string $key, ?string $default = null): ?string
     {
         if (! array_key_exists($key, static::$cache)) {
@@ -62,5 +67,46 @@ class Setting extends Model
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
+    }
+
+    public static function enabled(string $key, bool $default = true): bool
+    {
+        $value = static::get($key);
+
+        if ($value === null) {
+            return $default;
+        }
+
+        return ! in_array(strtolower($value), ['0', 'false', 'off', 'no', ''], true);
+    }
+
+    public static function text(string $key, string $default = ''): string
+    {
+        $value = static::get($key);
+
+        return filled($value) ? $value : $default;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function storefront(): array
+    {
+        return [
+            'search_placeholder' => static::text('header_search_placeholder', 'Search seeds, plants & more…'),
+            'show_home' => static::enabled('header_show_home'),
+            'home_label' => static::text('header_home_label', 'Home'),
+            'guide_label' => (string) static::get('header_guide_label', 'Growing guide'),
+            'guide_url' => static::text('header_guide_url', '#grower-guide'),
+            'show_contact' => static::enabled('header_show_contact'),
+            'contact_label' => static::text('header_contact_label', 'Contact Us'),
+            'show_account' => static::enabled('header_show_account'),
+            'top_eyebrow' => static::text('top_categories_eyebrow', 'Most Popular'),
+            'top_title' => static::text('top_categories_title', 'Top Categories'),
+            'top_intro' => static::text('top_categories_intro', 'Thoughtfully chosen seeds for kitchen gardens, flowering balconies, and productive fields—packed in practical quantities and ready to grow.'),
+            'catalog_eyebrow' => static::text('catalog_eyebrow', 'Fresh picks'),
+            'catalog_title' => static::text('catalog_title', 'Seeds worth growing'),
+            'catalog_intro' => static::text('catalog_intro', 'Browse by category, search a variety, or open any pack for more detail.'),
+        ];
     }
 }

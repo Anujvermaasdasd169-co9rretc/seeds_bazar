@@ -313,8 +313,10 @@
     const viewAllProducts = document.getElementById('view-all-products');
     let searchActiveIndex = -1;
 
+    let currentCategory = shop.dataset.activeCategory || 'all';
+
     function activeCategory() {
-        return document.querySelector('.filter-btn.is-active')?.dataset.category || 'all';
+        return currentCategory || 'all';
     }
 
     function searchQuery() {
@@ -327,6 +329,7 @@
             product.name,
             product.category,
             product.category_name,
+            (product.category_path_names || []).join(' '),
             product.unit,
             product.description,
         ].join(' ').toLowerCase();
@@ -340,7 +343,8 @@
         document.querySelectorAll('.product-card').forEach((card) => {
             const id = parseInt(card.dataset.id, 10);
             const product = findProduct(id);
-            const catOk = category === 'all' || card.dataset.category === category;
+            const path = `${card.dataset.categoryPath || ''} ${card.dataset.category || ''} ${(product?.category_path || []).join(' ')}`.trim().split(/\s+/);
+            const catOk = category === 'all' || path.includes(category);
             const searchOk = product ? productMatchesQuery(product, q) : (card.dataset.name || '').toLowerCase().includes(q);
             const show = catOk && searchOk;
             card.classList.toggle('is-hidden', !show);
@@ -353,8 +357,9 @@
     }
 
     function setCategoryFilter(category, scroll = true) {
+        currentCategory = category || 'all';
         document.querySelectorAll('.filter-btn').forEach((b) => {
-            b.classList.toggle('is-active', b.dataset.category === category);
+            b.classList.toggle('is-active', b.dataset.category === currentCategory);
         });
         applyProductFilters();
         if (scroll) {
@@ -362,27 +367,22 @@
         }
     }
 
-    function closeSeedsMenu() {
-        const menu = document.getElementById('seeds-menu');
-        const drop = document.getElementById('seeds-drop');
-        const toggle = document.getElementById('seeds-toggle');
-        menu?.classList.remove('is-open');
-        if (drop) drop.hidden = true;
-        toggle?.setAttribute('aria-expanded', 'false');
+    function closeAllNavMenus(except) {
+        document.querySelectorAll('[data-nav-item].is-open').forEach((item) => {
+            if (except && item === except) return;
+            if (except && item.contains(except)) return;
+            item.classList.remove('is-open');
+        });
     }
 
-    function toggleSeedsMenu() {
-        const menu = document.getElementById('seeds-menu');
-        const drop = document.getElementById('seeds-drop');
-        const toggle = document.getElementById('seeds-toggle');
-        const willOpen = !menu?.classList.contains('is-open');
-        if (willOpen) {
-            menu?.classList.add('is-open');
-            if (drop) drop.hidden = false;
-            toggle?.setAttribute('aria-expanded', 'true');
-        } else {
-            closeSeedsMenu();
-        }
+    function closeMobileNav() {
+        document.getElementById('main-nav')?.classList.remove('is-open');
+        document.getElementById('nav-toggle')?.setAttribute('aria-expanded', 'false');
+        closeAllNavMenus();
+    }
+
+    function isDesktopNav() {
+        return window.matchMedia('(min-width: 981px)').matches;
     }
 
     function highlightName(name, q) {
@@ -436,17 +436,23 @@
     }
 
     function goToProduct(id) {
+        const product = findProduct(id);
         const card = document.querySelector(`.product-card[data-id="${id}"]`);
         closeSearchDrop();
-        if (!card) return;
-        document.querySelectorAll('.filter-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.category === 'all'));
-        if (searchInput) searchInput.value = card.dataset.name || searchInput.value;
-        if (searchClear) searchClear.hidden = !searchQuery();
-        applyProductFilters();
-        card.classList.remove('is-hidden');
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.add('is-search-hit');
-        setTimeout(() => card.classList.remove('is-search-hit'), 1400);
+        if (card) {
+            document.querySelectorAll('.filter-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.category === 'all'));
+            if (searchInput) searchInput.value = card.dataset.name || searchInput.value;
+            if (searchClear) searchClear.hidden = !searchQuery();
+            applyProductFilters();
+            card.classList.remove('is-hidden');
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.add('is-search-hit');
+            setTimeout(() => card.classList.remove('is-search-hit'), 1400);
+            return;
+        }
+        if (product?.url) {
+            window.location.href = product.url;
+        }
     }
 
     document.querySelectorAll('.filter-btn').forEach((btn) => {
@@ -455,9 +461,14 @@
         });
     });
 
+    const initialCategory = shop.dataset.activeCategory || 'all';
+    if (initialCategory) {
+        setCategoryFilter(initialCategory, false);
+    }
+
     document.querySelectorAll('[data-category-link]').forEach((link) => {
         link.addEventListener('click', () => {
-            setCategoryFilter(link.dataset.categoryLink);
+            closeMobileNav();
         });
     });
 
@@ -467,20 +478,46 @@
     });
 
     document.getElementById('nav-home')?.addEventListener('click', (e) => {
+        if (shop.dataset.page !== 'home' || !document.getElementById('products-grid')) return;
         e.preventDefault();
-        closeSeedsMenu();
+        closeMobileNav();
         setCategoryFilter('all', false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    document.getElementById('seeds-toggle')?.addEventListener('click', (e) => {
+    document.getElementById('nav-toggle')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        toggleSeedsMenu();
+        const nav = document.getElementById('main-nav');
+        const toggle = document.getElementById('nav-toggle');
+        const open = !nav?.classList.contains('is-open');
+        nav?.classList.toggle('is-open', open);
+        toggle?.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    document.getElementById('seeds-drop')?.addEventListener('click', (e) => {
-        const item = e.target.closest('[data-nav-category]');
-        if (!item) return;
-        setCategoryFilter(item.dataset.navCategory);
-        closeSeedsMenu();
+    document.querySelectorAll('[data-nav-item]').forEach((item) => {
+        const trigger = item.querySelector(':scope > a');
+        trigger?.addEventListener('click', (e) => {
+            if (isDesktopNav()) return;
+            if (!item.querySelector(':scope > .header-nav__drop, :scope > .header-nav__flyout')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const willOpen = !item.classList.contains('is-open');
+            Array.from(item.parentElement?.children || []).forEach((sibling) => {
+                if (sibling !== item) sibling.classList.remove('is-open');
+            });
+            item.classList.toggle('is-open', willOpen);
+        });
+    });
+    document.querySelectorAll('[data-nav-category]').forEach((item) => {
+        item.addEventListener('click', () => {
+            const parentItem = item.closest('[data-nav-item]');
+            const isParentToggle = !isDesktopNav()
+                && parentItem
+                && item === parentItem.querySelector(':scope > a')
+                && parentItem.querySelector(':scope > .header-nav__drop, :scope > .header-nav__flyout');
+            if (isParentToggle) {
+                return;
+            }
+            closeMobileNav();
+        });
     });
 
     searchInput?.addEventListener('input', () => {
@@ -527,14 +564,14 @@
     });
     document.addEventListener('click', (e) => {
         if (searchRoot && !searchRoot.contains(e.target)) closeSearchDrop();
-        if (!document.getElementById('seeds-menu')?.contains(e.target)) closeSeedsMenu();
+        if (!document.getElementById('main-nav')?.contains(e.target) && !document.getElementById('nav-toggle')?.contains(e.target)) closeMobileNav();
     });
     document.addEventListener('keydown', (e) => {
         if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
             e.preventDefault();
             searchInput?.focus();
         }
-        if (e.key === 'Escape') closeSeedsMenu();
+        if (e.key === 'Escape') closeMobileNav();
     });
 
     // Add to cart buttons
