@@ -75,67 +75,31 @@
         </div>
     </header>
 
-    <section class="hero">
-        <div class="hero__bg" aria-hidden="true"></div>
-        <div class="hero__inner">
-            <div class="hero__content">
-                <div class="hero__kicker">
-                    <span class="hero__pill">Trusted seeds</span>
-                    <span class="hero__pill hero__pill--light">Fast WhatsApp order</span>
-                </div>
-
-                <h1>
-                    Grow your next
-                    <span class="hero__highlight">best harvest</span>
-                </h1>
-                <div class="hero-marquee" aria-label="Message">
-                    <div class="hero-marquee__track">
-                        <p class="hero-marquee__text">
-                            Premium vegetable, fruit, flower & grain seeds — order via WhatsApp in one click.
-                        </p>
-
-                    </div>
-                </div>
-
-                <div class="hero__actions">
-                    <a class="hero-btn hero-btn--primary" href="#products-grid">
-                        Shop now
-                        <span aria-hidden="true">→</span>
-                    </a>
-                    <a class="hero-btn hero-btn--ghost"
-                       href="https://wa.me/{{ preg_replace('/\\D+/', '', $whatsappNumber) }}?text={{ urlencode('Hi Seed Planta, I want to buy seeds. Please share availability & price list.') }}"
-                       target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                    </a>
-                </div>
-
-             
-            </div>
-
-            <div class="hero__art" aria-hidden="true">
-                <div class="hero__card hero__card--one">
-                    <span class="hero__card-emoji">🌿</span>
-                    <span class="hero__card-text">High germination</span>
-                </div>
-                <div class="hero__card hero__card--two">
-                    <span class="hero__card-emoji">🌱</span>
-                    <span class="hero__card-text">Premium quality</span>
-                </div>
-                <div class="hero__card hero__card--three">
-                    <span class="hero__card-emoji">🚚</span>
-                    <span class="hero__card-text">Quick dispatch</span>
-                </div>
-            </div>
+    <section class="hero-slider" id="hero-slider" aria-label="Seed Planta highlights">
+        <div class="hero-slider__track">
+            <article class="hero-slide is-active" data-slide="0">
+                <img src="{{ asset('banner/banner1.png') }}" alt="A productive garden filled with vegetables and plants" fetchpriority="high">
+                <div class="hero-slide__shade"></div>
+            </article>
+            <article class="hero-slide" data-slide="1" aria-hidden="true">
+                <img src="{{ asset('banner/banner2.png') }}" alt="Fresh fruit growing in a bright garden" loading="lazy">
+                <div class="hero-slide__shade"></div>
+            </article>
+            <article class="hero-slide" data-slide="2" aria-hidden="true">
+                <img src="{{ asset('banner/banner3.png') }}" alt="Colourful flowering plants in a garden nursery" loading="lazy">
+                <div class="hero-slide__shade"></div>
+            </article>
         </div>
-    </section>
-
-    <section class="trust-strip" aria-label="Why shop with Seed Planta">
-        <div class="trust-strip__inner">
-            <div class="trust-strip__item"><span aria-hidden="true">✓</span><p><strong>Quality checked</strong><small>Seeds selected for reliable growth</small></p></div>
-            <div class="trust-strip__item"><span aria-hidden="true">✦</span><p><strong>Fresh lots</strong><small>Stored carefully for better viability</small></p></div>
-            <div class="trust-strip__item"><span aria-hidden="true">⌂</span><p><strong>For every garden</strong><small>From balcony pots to farm plots</small></p></div>
-            <div class="trust-strip__item"><span aria-hidden="true">↗</span><p><strong>Grower support</strong><small>Ask us before you sow</small></p></div>
+        <div class="hero-slider__controls">
+            <button type="button" class="hero-slider__arrow" data-slider-prev aria-label="Previous banner">←</button>
+            <div class="hero-slider__dots" role="tablist" aria-label="Choose a banner">
+                <button type="button" class="hero-slider__dot is-active" data-slider-dot="0" role="tab" aria-label="Show banner 1" aria-selected="true"></button>
+                <button type="button" class="hero-slider__dot" data-slider-dot="1" role="tab" aria-label="Show banner 2" aria-selected="false"></button>
+                <button type="button" class="hero-slider__dot" data-slider-dot="2" role="tab" aria-label="Show banner 3" aria-selected="false"></button>
+            </div>
+            <button type="button" class="hero-slider__arrow" data-slider-next aria-label="Next banner">→</button>
         </div>
+        <div class="hero-slider__progress" aria-hidden="true"><span></span></div>
     </section>
 
     <section class="market-intro" aria-labelledby="market-title">
