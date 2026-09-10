@@ -609,6 +609,67 @@ body {
 
 .card__title { font-size: 1rem; margin-bottom: 1rem; }
 
+.settings-tabs {
+    max-width: 980px;
+}
+
+.settings-tabs__nav {
+    display: flex;
+    gap: .35rem;
+    margin-bottom: 1rem;
+    padding: .35rem;
+    border: 1px solid rgba(45, 106, 79, .12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .72);
+    box-shadow: 0 8px 20px rgba(26, 61, 46, .05);
+    overflow-x: auto;
+}
+
+.settings-tab {
+    flex: 1 0 auto;
+    min-height: 2.75rem;
+    padding: .55rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+    white-space: nowrap;
+}
+
+.settings-tab:hover {
+    color: var(--green-800);
+    background: var(--green-50);
+}
+
+.settings-tab.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--green-700), var(--green-600));
+    box-shadow: 0 7px 16px rgba(45, 106, 79, .2);
+}
+
+.settings-tab:focus-visible {
+    outline: 3px solid rgba(82, 183, 136, .4);
+    outline-offset: 2px;
+}
+
+.settings-panel[hidden] {
+    display: none;
+}
+
+.settings-card {
+    max-width: none;
+    margin: 0;
+}
+
+.settings-panel:focus {
+    outline: none;
+}
+
 .admin-form .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

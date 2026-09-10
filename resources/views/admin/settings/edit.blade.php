@@ -4,11 +4,19 @@
 
 @section('content')
 <div class="page-header">
-    <h1>Site Logo</h1>
-    <p>Upload a logo — it will show on the store and admin panel.</p>
+    <h1>Store Settings</h1>
+    <p>Manage your storefront content, shipping details, navigation, policies, and logo.</p>
 </div>
 
-<div class="card" style="max-width: 520px;">
+<div class="settings-tabs" data-settings-tabs>
+    <div class="settings-tabs__nav" role="tablist" aria-label="Store settings sections">
+        <button type="button" class="settings-tab is-active" role="tab" aria-selected="true" aria-controls="settings-store" data-settings-tab="settings-store">Store &amp; Shipping</button>
+        <button type="button" class="settings-tab" role="tab" aria-selected="false" aria-controls="settings-header" data-settings-tab="settings-header">Header &amp; Homepage</button>
+        <button type="button" class="settings-tab" role="tab" aria-selected="false" aria-controls="settings-logo" data-settings-tab="settings-logo">Logo</button>
+    </div>
+
+<section class="settings-panel is-active" id="settings-store" role="tabpanel" tabindex="0">
+<div class="card settings-card">
     <h2 class="card__title">Storefront &amp; shipping</h2>
     <form method="POST" action="{{ route('admin.settings.update') }}" class="admin-form">
         @csrf
@@ -28,8 +36,10 @@
         <div class="form-actions" style="margin-top: 1rem; padding-top: 0; border: none;"><button type="submit" class="btn btn--primary">Save Store Settings</button></div>
     </form>
 </div>
+</section>
 
-<div class="card" style="max-width: 520px; margin-top: 1.5rem;">
+<section class="settings-panel" id="settings-header" role="tabpanel" tabindex="0" hidden>
+<div class="card settings-card">
     <h2 class="card__title">Header &amp; homepage</h2>
     <p class="field-hint" style="margin-bottom: 1rem;">These labels control the storefront header, search, Top Categories, and catalog headings. Categories themselves are managed under Categories. Leave Growing guide blank to hide that header link.</p>
     <form method="POST" action="{{ route('admin.settings.update') }}" class="admin-form">
@@ -61,8 +71,10 @@
         <div class="form-actions" style="margin-top: 1rem; padding-top: 0; border: none;"><button type="submit" class="btn btn--primary">Save header &amp; homepage</button></div>
     </form>
 </div>
+</section>
 
-<div class="card" style="max-width: 520px; margin-top: 1.5rem;">
+<section class="settings-panel" id="settings-logo" role="tabpanel" tabindex="0" hidden>
+<div class="card settings-card">
     @if ($logoUrl)
         <div class="logo-preview">
             <p class="card__title">Current logo</p>
@@ -90,4 +102,42 @@
         </div>
     </form>
 </div>
+</section>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        var root = document.querySelector('[data-settings-tabs]');
+        if (!root) return;
+
+        var tabs = Array.from(root.querySelectorAll('[data-settings-tab]'));
+        var panels = Array.from(root.querySelectorAll('.settings-panel'));
+
+        function activate(id, moveFocus) {
+            tabs.forEach(function (tab) {
+                var active = tab.dataset.settingsTab === id;
+                tab.classList.toggle('is-active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+                tab.tabIndex = active ? 0 : -1;
+            });
+            panels.forEach(function (panel) {
+                panel.hidden = panel.id !== id;
+                panel.classList.toggle('is-active', panel.id === id);
+            });
+            if (moveFocus) root.querySelector('[data-settings-tab="' + id + '"]').focus();
+        }
+
+        tabs.forEach(function (tab, index) {
+            tab.addEventListener('click', function () { activate(tab.dataset.settingsTab, false); });
+            tab.addEventListener('keydown', function (event) {
+                if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+                event.preventDefault();
+                var next = event.key === 'ArrowRight' ? (index + 1) % tabs.length : (index - 1 + tabs.length) % tabs.length;
+                activate(tabs[next].dataset.settingsTab, true);
+            });
+        });
+    })();
+</script>
+@endpush

@@ -3029,9 +3029,9 @@ body {
     box-shadow: 0 0 0 4px rgba(82, 183, 136, .16), 0 5px 14px rgba(26, 61, 46, .06);
 }
 
-:is(.auth-form, .contact-form, .modal-form, .review-form) input:invalid:not(:placeholder-shown),
-:is(.auth-form, .contact-form, .modal-form, .review-form) select:invalid:not(:focus),
-:is(.auth-form, .contact-form, .modal-form, .review-form) textarea:invalid:not(:placeholder-shown) {
+:is(.auth-form, .contact-form, .modal-form, .review-form) input:user-invalid,
+:is(.auth-form, .contact-form, .modal-form, .review-form) select:user-invalid,
+:is(.auth-form, .contact-form, .modal-form, .review-form) textarea:user-invalid {
     border-color: #d9776b;
 }
 
