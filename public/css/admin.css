@@ -201,6 +201,9 @@ body {
 }
 
 .admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
     width: 240px;
     background: var(--green-900);
     color: var(--white);
@@ -208,6 +211,7 @@ body {
     flex-direction: column;
     padding: 1.5rem 1rem;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .admin-brand {
@@ -1033,7 +1037,13 @@ code { font-size: 0.8rem; background: #f0f0f0; padding: 0.15rem 0.4rem; border-r
 
 @media (max-width: 768px) {
     .admin-body { flex-direction: column; }
-    .admin-sidebar { width: 100%; }
+    .admin-sidebar {
+        position: relative;
+        top: auto;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
     .admin-form .form-grid { grid-template-columns: 1fr; }
     .order-show,
     .order-show__tiles { grid-template-columns: 1fr; }
