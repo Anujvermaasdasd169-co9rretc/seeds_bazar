@@ -2178,6 +2178,18 @@ body {
     color: rgba(255, 255, 255, 0.55);
 }
 
+.footer__bottom a {
+    color: rgba(255, 255, 255, .86);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.footer__bottom a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 @media (max-width: 900px) {
     .footer__inner {
         grid-template-columns: 1fr 1fr;
