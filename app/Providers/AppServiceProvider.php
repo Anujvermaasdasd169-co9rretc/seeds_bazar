@@ -40,6 +40,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('reviews', fn ($request) => [
             Limit::perMinute(5)->by((string) $request->user()?->getAuthIdentifier().'|'.$request->ip()),
         ]);
+        RateLimiter::for('admin-login', fn ($request) => [
+            Limit::perMinute(5)->by(strtolower((string) $request->input('email')).'|'.$request->ip()),
+        ]);
+        RateLimiter::for('contact', fn ($request) => [
+            Limit::perMinute(5)->by($request->ip()),
+        ]);
 
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');

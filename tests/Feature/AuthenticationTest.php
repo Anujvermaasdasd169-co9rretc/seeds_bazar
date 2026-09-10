@@ -173,8 +173,24 @@ class AuthenticationTest extends TestCase
         $this->assertArrayNotHasKey('remember_token', $serialized);
     }
 
+    public function test_is_admin_cannot_be_mass_assigned(): void
+    {
+        $user = User::factory()->create();
+
+        $user->update(['is_admin' => true, 'name' => 'Updated Customer']);
+
+        $this->assertFalse($user->fresh()->is_admin);
+        $this->assertSame('Updated Customer', $user->fresh()->name);
+    }
+
     public function test_guests_are_redirected_to_customer_login_for_account(): void
     {
         $this->get(route('account'))->assertRedirect(route('login'));
+    }
+
+    public function test_contact_forms_include_csrf_tokens(): void
+    {
+        $this->get(route('contact.show'))->assertOk()->assertSee('name="_token"', false);
+        $this->get(route('shop.index'))->assertOk()->assertSee('name="_token"', false);
     }
 }

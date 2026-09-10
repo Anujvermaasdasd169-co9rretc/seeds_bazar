@@ -24,7 +24,7 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/products/{product}', [ShopController::class, 'show'])->name('products.show');
 Route::post('/reviews', [ShopController::class, 'storeReview'])->middleware('throttle:reviews')->name('reviews.store');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
 Route::view('/policies/shipping', 'policies.show', ['policy' => 'shipping'])->name('policies.shipping');
 Route::view('/policies/returns', 'policies.show', ['policy' => 'returns'])->name('policies.returns');
 Route::view('/policies/privacy', 'policies.show', ['policy' => 'privacy'])->name('policies.privacy');
@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
-        Route::post('login', [AdminAuthController::class, 'login'])->name('login.submit');
+        Route::post('login', [AdminAuthController::class, 'login'])->middleware('throttle:admin-login')->name('login.submit');
     });
 
     Route::middleware(['auth', 'admin'])->group(function () {

@@ -93,7 +93,7 @@ class SettingController extends Controller
     public function updateLogo(Request $request): RedirectResponse
     {
         $request->validate([
-            'logo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,gif,svg'],
+            'logo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
         ]);
 
         Setting::deleteLogoFile();

@@ -36,6 +36,16 @@ class CommerceFlowTest extends TestCase
         $this->assertSame('Tomato Seeds', $order->items->first()->product_name);
         $this->assertSame(3, $product->fresh()->stock_quantity);
         $this->assertNotNull($order->fresh()->stock_deducted_at);
+        $this->assertNotEmpty($product->fresh()->slug);
+        $this->assertNotEmpty($product->fresh()->sku);
+        $this->assertDatabaseHas('inventory_logs', [
+            'product_id' => $product->id,
+            'change_type' => 'order',
+            'quantity' => -2,
+            'before_stock' => 5,
+            'after_stock' => 3,
+            'reference_id' => $order->id,
+        ]);
     }
 
     public function test_checkout_rejects_inactive_products(): void
@@ -273,6 +283,11 @@ class CommerceFlowTest extends TestCase
 
         $this->actingAs($user)->post(route('orders.cancel', $order))->assertRedirect();
         $this->assertSame(5, $product->fresh()->stock_quantity);
+        $this->assertDatabaseHas('inventory_logs', [
+            'product_id' => $product->id,
+            'change_type' => 'cancellation',
+            'quantity' => 2,
+        ]);
     }
 
     public function test_pending_online_cancellation_does_not_restore_stock(): void

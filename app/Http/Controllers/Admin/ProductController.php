@@ -85,12 +85,12 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        $product->deleteImageFile();
+        $product->update(['is_active' => false]);
         $product->delete();
 
         return redirect()
             ->route('admin.products.index')
-            ->with('success', 'Product deleted.');
+            ->with('success', 'Product deactivated and archived.');
     }
 
     private function storeImage(UploadedFile $file): string
@@ -118,7 +118,7 @@ class ProductController extends Controller
             'stock_quantity' => ['required', 'integer', 'min:0', 'max:4294967295'],
             'unit' => ['required', 'string', 'max:100'],
             'emoji' => ['nullable', 'string', 'max:16'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
             'remove_image' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
         ]);

@@ -27,7 +27,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'mobile',
         'terms_accepted_at',
         'password',
-        'is_admin',
     ];
 
     /**
@@ -68,5 +67,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
     }
 }
