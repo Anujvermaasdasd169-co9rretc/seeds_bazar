@@ -211,7 +211,7 @@
                                 </button>
                             @endif
                         </form>
-                        @if (($category->products_count ?? $category->products()->count()) === 0 && $category->children->isEmpty())
+                        @if (($category->products_count ?? $category->products()->withTrashed()->count()) === 0 && $category->children->isEmpty())
                             <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" class="inline-form" onsubmit="return confirm('Delete this category?')">
                                 @csrf
                                 @method('DELETE')
@@ -226,7 +226,7 @@
                                 </button>
                             </form>
                         @else
-                            <span class="icon-btn icon-btn--danger is-disabled" title="Cannot delete: category has products or sub-categories" aria-disabled="true">
+                            <span class="icon-btn icon-btn--danger is-disabled" title="Cannot delete: category has products, archived products, or sub-categories" aria-disabled="true">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path d="M3 6h18"/>
                                     <path d="M8 6V4h8v2"/>

@@ -68,8 +68,8 @@ class CategoryController extends Controller
 
     public function destroy(Category $category): RedirectResponse
     {
-        if ($category->products()->exists()) {
-            return back()->withErrors(['category' => 'Cannot delete category with products.']);
+        if ($category->products()->withTrashed()->exists()) {
+            return back()->withErrors(['category' => 'Cannot delete a category that has products, including archived products. Move the products to another category first.']);
         }
 
         if ($category->children()->exists()) {

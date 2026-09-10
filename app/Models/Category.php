@@ -243,7 +243,9 @@ class Category extends Model
     public static function flattenedTree(?int $excludeId = null): Collection
     {
         $withCounts = static function ($query): void {
-            $query->withCount('products')->orderBy('sort_order')->orderBy('name');
+            $query->withCount(['products as products_count' => fn ($products) => $products->withTrashed()])
+                ->orderBy('sort_order')
+                ->orderBy('name');
         };
 
         $roots = static::query()
@@ -251,7 +253,7 @@ class Category extends Model
                 $withCounts($query);
                 $query->with(['children' => $withCounts]);
             }])
-            ->withCount('products')
+            ->withCount(['products as products_count' => fn ($products) => $products->withTrashed()])
             ->whereNull('parent_id')
             ->orderBy('sort_order')
             ->orderBy('name')
