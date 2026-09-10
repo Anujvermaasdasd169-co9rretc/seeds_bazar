@@ -1091,6 +1091,28 @@ body {
     font: inherit;
 }
 
+.header-actions .header-link {
+    min-height: 34px;
+    padding: .52rem .82rem;
+    border-radius: 999px;
+    color: var(--green-800);
+    font-family: var(--font);
+    font-size: .72rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .02em;
+    text-transform: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(26, 61, 46, .06);
+}
+
+.header-actions .header-link:hover {
+    color: var(--green-900);
+    background: var(--green-50);
+    border-color: rgba(45, 106, 79, .26);
+    box-shadow: 0 7px 16px rgba(26, 61, 46, .1);
+}
+
 .logo__text {
     display: flex;
     flex-direction: column;
@@ -1336,6 +1358,9 @@ body {
 
 .review-submit {
     align-self: end;
+    justify-self: end;
+    width: fit-content;
+    min-width: 150px;
     min-height: 42px;
     border: 0;
     border-radius: 8px;
@@ -1385,6 +1410,10 @@ body {
     .review-form,
     .reviews-list { grid-template-columns: 1fr; }
     .review-field--wide { grid-column: auto; }
+    .review-submit {
+        justify-self: stretch;
+        width: 100%;
+    }
 }
 
 .hero__actions {
