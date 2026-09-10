@@ -138,7 +138,7 @@ class CategoryController extends Controller
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'show_in_header' => ['sometimes', 'boolean'],
             'show_on_home' => ['sometimes', 'boolean'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:2048'],
             'remove_image' => ['sometimes', 'boolean'],
         ]);
 
