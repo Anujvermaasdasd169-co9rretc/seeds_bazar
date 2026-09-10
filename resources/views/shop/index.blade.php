@@ -78,15 +78,15 @@
     <section class="hero-slider" id="hero-slider" aria-label="Seed Planta highlights">
         <div class="hero-slider__track">
             <article class="hero-slide is-active" data-slide="0">
-                <img src="{{ asset('banner/banner1.png') }}" alt="A productive garden filled with vegetables and plants" fetchpriority="high">
+                <img src="{{ asset('banner/1.png') }}" alt="A productive garden filled with vegetables and plants" fetchpriority="high">
                 <div class="hero-slide__shade"></div>
             </article>
             <article class="hero-slide" data-slide="1" aria-hidden="true">
-                <img src="{{ asset('banner/banner2.png') }}" alt="Fresh fruit growing in a bright garden" loading="lazy">
+                <img src="{{ asset('banner/2.png') }}" alt="Fresh fruit growing in a bright garden" loading="lazy">
                 <div class="hero-slide__shade"></div>
             </article>
             <article class="hero-slide" data-slide="2" aria-hidden="true">
-                <img src="{{ asset('banner/banner3.png') }}" alt="Colourful flowering plants in a garden nursery" loading="lazy">
+                <img src="{{ asset('banner/3.png') }}" alt="Colourful flowering plants in a garden nursery" loading="lazy">
                 <div class="hero-slide__shade"></div>
             </article>
         </div>
