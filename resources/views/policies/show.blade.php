@@ -14,5 +14,9 @@
 @section('title', $content[0].' — Seed Planta')
 
 @section('content')
-<main class="policy-page"><header><a href="{{ route('shop.index') }}" class="policy-page__brand"><x-site-logo class="logo__icon" /></a><a href="{{ route('shop.index') }}" class="text-link">← Back to shop</a></header><section class="policy-page__hero"><span class="section-eyebrow">Seed Planta policies</span><h1>{{ $content[0] }}</h1><p>{{ $content[1] }}</p></section><section class="policy-page__content">@if (filled($customContent))<article class="policy-page__custom-content">{!! nl2br(e($customContent)) !!}</article>@else @foreach ($content[2] as [$heading, $copy])<article><h2>{{ $heading }}</h2><p>{{ $copy }}</p></article>@endforeach @endif</section><footer>Last updated: {{ now()->format('F Y') }} · For policy questions, <a href="{{ route('contact.show') }}">contact Seed Planta</a>.</footer></main>
+<x-storefront-header />
+<x-storefront-banner />
+
+<main class="policy-page"><header><a href="{{ route('shop.index') }}" class="text-link">← Back to shop</a></header><section class="policy-page__hero"><span class="section-eyebrow">Seed Planta policies</span><h1>{{ $content[0] }}</h1><p>{{ $content[1] }}</p></section><section class="policy-page__content">@if (filled($customContent))<article class="policy-page__custom-content">{!! nl2br(e($customContent)) !!}</article>@else @foreach ($content[2] as [$heading, $copy])<article><h2>{{ $heading }}</h2><p>{{ $copy }}</p></article>@endforeach @endif</section><footer>Last updated: {{ now()->format('F Y') }} · For policy questions, <a href="{{ route('contact.show') }}">contact Seed Planta</a>.</footer></main>
+<x-storefront-footer />
 @endsection

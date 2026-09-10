@@ -28,6 +28,7 @@
     <script type="application/json" id="shop-products">@json($searchProducts ?? collect([$product])->merge($relatedProducts)->values())</script>
 
     <x-storefront-header :nav-categories="$navCategories" :storefront="$storefront ?? null" />
+        <x-storefront-banner />
 
     <main class="product-page__main">
         <nav class="breadcrumbs" aria-label="Breadcrumb">

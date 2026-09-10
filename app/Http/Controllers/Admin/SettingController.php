@@ -38,7 +38,7 @@ class SettingController extends Controller
                 'top_categories_intro' => Setting::get('top_categories_intro', 'Thoughtfully chosen seeds for kitchen gardens, flowering balconies, and productive fields—packed in practical quantities and ready to grow.'),
                 'catalog_eyebrow' => Setting::get('catalog_eyebrow', 'Fresh picks'),
                 'catalog_title' => Setting::get('catalog_title', 'Seeds worth growing'),
-                'catalog_intro' => Setting::get('catalog_intro', 'Browse by category, search a variety, or open any pack for more detail.'),
+                'catalog_intro' => Setting::get('catalog_intro', ''),
             ],
         ]);
     }

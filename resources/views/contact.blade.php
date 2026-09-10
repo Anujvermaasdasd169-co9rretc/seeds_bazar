@@ -3,6 +3,9 @@
 @section('title', 'Contact Us — Seed Planta')
 
 @section('content')
+<x-storefront-header />
+<x-storefront-banner />
+
 <div class="contact-wrap">
     <div class="contact-card">
         <div class="contact-hero">
@@ -58,5 +61,6 @@
         </form>
     </div>
 </div>
+<x-storefront-footer />
 @endsection
 

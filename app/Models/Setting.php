@@ -106,7 +106,7 @@ class Setting extends Model
             'top_intro' => static::text('top_categories_intro', 'Thoughtfully chosen seeds for kitchen gardens, flowering balconies, and productive fields—packed in practical quantities and ready to grow.'),
             'catalog_eyebrow' => static::text('catalog_eyebrow', 'Fresh picks'),
             'catalog_title' => static::text('catalog_title', 'Seeds worth growing'),
-            'catalog_intro' => static::text('catalog_intro', 'Browse by category, search a variety, or open any pack for more detail.'),
+            'catalog_intro' => static::text('catalog_intro', ''),
         ];
     }
 }

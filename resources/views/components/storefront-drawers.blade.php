@@ -89,7 +89,6 @@
 
     <div class="modal__body">
         <div class="modal__alert modal__alert--success" id="contact-success" hidden></div>
-        <div class="modal__alert modal__alert--error" id="contact-error" hidden></div>
 
         <form id="contact-form" method="POST" action="{{ route('contact.store', absolute: false) }}" class="modal-form" novalidate>
             <div class="modal-grid">

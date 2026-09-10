@@ -4,12 +4,13 @@
     $hasChildren = $category->children->isNotEmpty();
     $href = route('shop.category', $category);
     $linkClass = $level === 1 ? 'header-nav__link' : 'header-nav__drop-item';
+    $isActive = request()->routeIs('shop.category') && request()->route('category')?->slug === $category->slug;
 @endphp
 
 @if ($hasChildren)
     <div class="header-nav__item {{ $level > 1 ? 'header-nav__item--sub' : '' }}" data-nav-item>
         <a href="{{ $href }}"
-           class="{{ $linkClass }} {{ $level === 1 ? 'header-nav__link--parent' : '' }}"
+           class="{{ $linkClass }} {{ $level === 1 ? 'header-nav__link--parent' : '' }} {{ $isActive ? 'is-active' : '' }}"
            data-nav-category="{{ $category->slug }}"
            aria-haspopup="true">
             <span>{{ $category->displayName() }}</span>
@@ -28,5 +29,5 @@
         </div>
     </div>
 @else
-    <a href="{{ $href }}" class="{{ $linkClass }}" data-nav-category="{{ $category->slug }}">{{ $category->displayName() }}</a>
+    <a href="{{ $href }}" class="{{ $linkClass }} {{ $isActive ? 'is-active' : '' }}" data-nav-category="{{ $category->slug }}">{{ $category->displayName() }}</a>
 @endif

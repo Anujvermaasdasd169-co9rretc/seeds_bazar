@@ -75,7 +75,7 @@
     <nav class="header-nav" id="main-nav" aria-label="Main">
         <div class="header-nav__inner">
             @if ($storefront['show_home'])
-                <a href="{{ route('shop.index') }}" class="header-nav__link" id="nav-home">{{ $storefront['home_label'] }}</a>
+                <a href="{{ route('shop.index') }}" class="header-nav__link {{ request()->routeIs('shop.index') ? 'is-active' : '' }}" id="nav-home">{{ $storefront['home_label'] }}</a>
             @endif
             @foreach ($navCategories as $category)
                 <x-nav-category :category="$category" :level="1" />

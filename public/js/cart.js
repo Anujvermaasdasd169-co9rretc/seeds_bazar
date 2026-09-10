@@ -315,54 +315,6 @@
 
     let currentCategory = shop.dataset.activeCategory || 'all';
 
-    // Keep the banner controls independent from product filtering.
-    const heroSlider = document.getElementById('hero-slider');
-    if (heroSlider) {
-        const slides = [...heroSlider.querySelectorAll('.hero-slide')];
-        const dots = [...heroSlider.querySelectorAll('[data-slider-dot]')];
-        let currentSlide = 0;
-        let autoplayTimer;
-
-        function showSlide(index) {
-            currentSlide = (index + slides.length) % slides.length;
-            slides.forEach((slide, slideIndex) => {
-                const active = slideIndex === currentSlide;
-                slide.classList.toggle('is-active', active);
-                slide.setAttribute('aria-hidden', active ? 'false' : 'true');
-            });
-            dots.forEach((dot, dotIndex) => {
-                const active = dotIndex === currentSlide;
-                dot.classList.toggle('is-active', active);
-                dot.setAttribute('aria-selected', active ? 'true' : 'false');
-            });
-        }
-
-        function startAutoplay() {
-            clearInterval(autoplayTimer);
-            heroSlider.classList.add('is-playing');
-            autoplayTimer = setInterval(() => showSlide(currentSlide + 1), 1000);
-        }
-
-        function pauseAutoplay() {
-            clearInterval(autoplayTimer);
-            heroSlider.classList.remove('is-playing');
-        }
-
-        heroSlider.querySelector('[data-slider-prev]')?.addEventListener('click', () => { showSlide(currentSlide - 1); startAutoplay(); });
-        heroSlider.querySelector('[data-slider-next]')?.addEventListener('click', () => { showSlide(currentSlide + 1); startAutoplay(); });
-        dots.forEach((dot) => dot.addEventListener('click', () => { showSlide(Number(dot.dataset.sliderDot)); startAutoplay(); }));
-        heroSlider.addEventListener('mouseenter', pauseAutoplay);
-        heroSlider.addEventListener('mouseleave', startAutoplay);
-        heroSlider.addEventListener('focusin', pauseAutoplay);
-        heroSlider.addEventListener('focusout', (event) => { if (!heroSlider.contains(event.relatedTarget)) startAutoplay(); });
-        heroSlider.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft') { showSlide(currentSlide - 1); startAutoplay(); }
-            if (event.key === 'ArrowRight') { showSlide(currentSlide + 1); startAutoplay(); }
-        });
-        showSlide(0);
-        startAutoplay();
-    }
-
     function activeCategory() {
         return currentCategory || 'all';
     }
@@ -1017,7 +969,6 @@
     const contactClose = document.getElementById('contact-close');
     const contactForm = document.getElementById('contact-form');
     const contactSuccess = document.getElementById('contact-success');
-    const contactError = document.getElementById('contact-error');
 
     function openContact() {
         if (!contactOverlay || !contactModal) return;
@@ -1028,7 +979,6 @@
             contactModal.classList.add('is-open');
         });
         document.body.style.overflow = 'hidden';
-        contactError.hidden = true;
         contactSuccess.hidden = true;
         contactForm?.querySelector('input[name="name"]')?.focus();
     }
@@ -1051,8 +1001,8 @@
 
     contactForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        contactError.hidden = true;
         contactSuccess.hidden = true;
+        contactForm.querySelectorAll('.is-invalid').forEach((field) => field.classList.remove('is-invalid'));
 
         const formData = new FormData(contactForm);
 
@@ -1068,10 +1018,9 @@
 
             if (!res.ok) {
                 const data = await res.json().catch(() => null);
-                const msg = data?.message || 'Please check your details and try again.';
-                const errs = data?.errors ? Object.values(data.errors).flat().join(' ') : '';
-                contactError.textContent = (errs ? errs : msg);
-                contactError.hidden = false;
+                Object.keys(data?.errors || {}).forEach((fieldName) => {
+                    contactForm.querySelector(`[name="${fieldName}"]`)?.classList.add('is-invalid');
+                });
                 return;
             }
 
@@ -1081,8 +1030,7 @@
             contactForm.reset();
             showToast('Contact submitted');
         } catch {
-            contactError.textContent = 'Network error. Please try again.';
-            contactError.hidden = false;
+            contactForm.querySelectorAll('input:not([type="hidden"]), textarea').forEach((field) => field.classList.add('is-invalid'));
         }
     });
 })();

@@ -971,3 +971,137 @@ code { font-size: 0.8rem; background: #f0f0f0; padding: 0.15rem 0.4rem; border-r
     .order-show,
     .order-show__tiles { grid-template-columns: 1fr; }
 }
+
+/* Shared admin form polish */
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) input:not([type="checkbox"]):not([type="hidden"]),
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) select,
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) textarea {
+    min-height: 3rem;
+    border: 1px solid rgba(45, 106, 79, .18);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) input:not([type="checkbox"]):not([type="hidden"]),
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) select {
+    padding: .72rem .85rem;
+}
+
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) textarea {
+    padding: .75rem .85rem;
+    resize: vertical;
+}
+
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) input::placeholder,
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) textarea::placeholder {
+    color: #91a099;
+}
+
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) select {
+    appearance: none;
+    padding-right: 2.65rem;
+    background-color: #fff;
+    background-image: linear-gradient(45deg, transparent 50%, var(--green-700) 50%), linear-gradient(135deg, var(--green-700) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 1.28rem, calc(100% - 13px) 1.28rem;
+    background-repeat: no-repeat;
+    background-size: 5px 5px, 5px 5px;
+}
+
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) input:not([type="checkbox"]):not([type="hidden"]):focus,
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) select:focus,
+:is(.admin-form, .admin-toolbar, .order-show__status, .login-form) textarea:focus {
+    outline: none;
+    border-color: var(--green-600);
+    background: #fcfffd;
+    box-shadow: 0 0 0 4px rgba(82, 183, 136, .16), 0 5px 14px rgba(26, 61, 46, .06);
+}
+
+:is(.admin-form, .login-form) input[type="file"] {
+    min-height: 3rem;
+    padding: .45rem;
+    cursor: pointer;
+}
+
+:is(.admin-form, .login-form) input[type="file"]::file-selector-button {
+    margin-right: .65rem;
+    padding: .45rem .7rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--green-50);
+    color: var(--green-800);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+:is(.admin-form, .login-form) input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--green-700);
+}
+
+.form-field > span,
+.login-form label span,
+.admin-toolbar__field span {
+    color: var(--green-900);
+}
+
+.form-field:focus-within > span,
+.admin-toolbar__field:focus-within span {
+    color: var(--green-700);
+}
+
+.form-actions {
+    align-items: center;
+}
+
+.btn {
+    min-height: 2.9rem;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(26, 61, 46, .12);
+}
+
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.admin-toolbar select:focus-visible,
+.admin-profile__btn:focus-visible {
+    outline: 3px solid rgba(82, 183, 136, .42);
+    outline-offset: 3px;
+}
+
+.btn:disabled {
+    opacity: .65;
+    cursor: wait;
+    transform: none;
+}
+
+.alert--error,
+.form-error {
+    border-left: 4px solid var(--danger);
+}
+
+@media (max-width: 560px) {
+    .admin-main {
+        padding: 1.25rem;
+    }
+
+    .card {
+        padding: 1.1rem;
+    }
+
+    .form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
