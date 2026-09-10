@@ -196,7 +196,7 @@ body {
 
 .admin-main {
     flex: 1;
-    padding: 2rem;
+    padding: 1.5rem 1.25rem;
     overflow-x: auto;
 }
 
@@ -610,7 +610,13 @@ body {
 .card__title { font-size: 1rem; margin-bottom: 1rem; }
 
 .settings-tabs {
-    max-width: 980px;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+}
+
+.admin-main > .page-header {
+    width: min(100%, 1180px);
+    margin-inline: auto;
 }
 
 .settings-tabs__nav {
