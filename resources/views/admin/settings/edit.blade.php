@@ -27,9 +27,42 @@
         </div>
         <div class="form-actions" style="margin-top: 1rem; padding-top: 0; border: none;"><button type="submit" class="btn btn--primary">Save Store Settings</button></div>
     </form>
+</div>
 
-    <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #eee;">
-    <h2 class="card__title">Site logo</h2>
+<div class="card" style="max-width: 520px; margin-top: 1.5rem;">
+    <h2 class="card__title">Header &amp; homepage</h2>
+    <p class="field-hint" style="margin-bottom: 1rem;">These labels control the storefront header, search, Top Categories, and catalog headings. Categories themselves are managed under Categories. Leave Growing guide blank to hide that header link.</p>
+    <form method="POST" action="{{ route('admin.settings.update') }}" class="admin-form">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="_storefront" value="1">
+        <input type="hidden" name="tagline" value="{{ $settings['tagline'] }}">
+        <input type="hidden" name="whatsapp_number" value="{{ $settings['whatsapp_number'] }}">
+        <input type="hidden" name="shipping_flat_rate" value="{{ $settings['shipping_flat_rate'] }}">
+        <input type="hidden" name="free_shipping_threshold" value="{{ $settings['free_shipping_threshold'] }}">
+        <input type="hidden" name="shipping_estimate" value="{{ $settings['shipping_estimate'] }}">
+        <input type="hidden" name="shipping_method" value="{{ $settings['shipping_method'] }}">
+        <div class="form-grid">
+            <label class="form-field form-field--full"><span>Search placeholder</span><input type="text" name="header_search_placeholder" value="{{ old('header_search_placeholder', $settings['header_search_placeholder']) }}" maxlength="120"></label>
+            <label class="form-field"><span>Home link label</span><input type="text" name="header_home_label" value="{{ old('header_home_label', $settings['header_home_label']) }}" maxlength="40"></label>
+            <label class="form-field"><span>Contact button label</span><input type="text" name="header_contact_label" value="{{ old('header_contact_label', $settings['header_contact_label']) }}" maxlength="40"></label>
+            <label class="form-field"><span>Growing guide label</span><input type="text" name="header_guide_label" value="{{ old('header_guide_label', $settings['header_guide_label']) }}" maxlength="40" placeholder="Leave empty to hide"></label>
+            <label class="form-field"><span>Growing guide URL</span><input type="text" name="header_guide_url" value="{{ old('header_guide_url', $settings['header_guide_url']) }}" maxlength="255" placeholder="#grower-guide"></label>
+            <label class="form-field checkbox-field"><input type="hidden" name="header_show_home" value="0"><input type="checkbox" name="header_show_home" value="1" @checked(old('header_show_home', $settings['header_show_home']))><span>Show Home in the header</span></label>
+            <label class="form-field checkbox-field"><input type="hidden" name="header_show_contact" value="0"><input type="checkbox" name="header_show_contact" value="1" @checked(old('header_show_contact', $settings['header_show_contact']))><span>Show Contact Us</span></label>
+            <label class="form-field checkbox-field"><input type="hidden" name="header_show_account" value="0"><input type="checkbox" name="header_show_account" value="1" @checked(old('header_show_account', $settings['header_show_account']))><span>Show Log in / Account</span></label>
+            <label class="form-field"><span>Top Categories eyebrow</span><input type="text" name="top_categories_eyebrow" value="{{ old('top_categories_eyebrow', $settings['top_categories_eyebrow']) }}" maxlength="80"></label>
+            <label class="form-field"><span>Top Categories title</span><input type="text" name="top_categories_title" value="{{ old('top_categories_title', $settings['top_categories_title']) }}" maxlength="80"></label>
+            <label class="form-field form-field--full"><span>Top Categories intro</span><textarea name="top_categories_intro" rows="3" maxlength="400">{{ old('top_categories_intro', $settings['top_categories_intro']) }}</textarea></label>
+            <label class="form-field"><span>Catalog eyebrow</span><input type="text" name="catalog_eyebrow" value="{{ old('catalog_eyebrow', $settings['catalog_eyebrow']) }}" maxlength="80"></label>
+            <label class="form-field"><span>Catalog title</span><input type="text" name="catalog_title" value="{{ old('catalog_title', $settings['catalog_title']) }}" maxlength="80"></label>
+            <label class="form-field form-field--full"><span>Catalog intro</span><textarea name="catalog_intro" rows="3" maxlength="400">{{ old('catalog_intro', $settings['catalog_intro']) }}</textarea></label>
+        </div>
+        <div class="form-actions" style="margin-top: 1rem; padding-top: 0; border: none;"><button type="submit" class="btn btn--primary">Save header &amp; homepage</button></div>
+    </form>
+</div>
+
+<div class="card" style="max-width: 520px; margin-top: 1.5rem;">
     @if ($logoUrl)
         <div class="logo-preview">
             <p class="card__title">Current logo</p>

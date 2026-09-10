@@ -17,7 +17,7 @@
         <select name="category_id" onchange="this.form.submit()">
             <option value="">All categories</option>
             @foreach ($categories as $category)
-                <option value="{{ $category->id }}" @selected($categoryId === $category->id)>{{ $category->name }}</option>
+                <option value="{{ $category->id }}" @selected($categoryId === $category->id)>{{ str_repeat('— ', max(0, (int) ($category->depth ?? 1) - 1)) }}{{ $category->name }}</option>
             @endforeach
         </select>
     </label>

@@ -25,7 +25,10 @@ class StorefrontContentTest extends TestCase
             ->assertSee('Chilli Seeds')
             ->assertSee('July–September')
             ->assertSee('Full sun')
-            ->assertSee('Add to cart');
+            ->assertSee('Add to cart')
+            ->assertSee('header-search', false)
+            ->assertSee('cart-toggle', false)
+            ->assertSee('Log in');
     }
 
     public function test_inactive_product_detail_page_is_not_public(): void

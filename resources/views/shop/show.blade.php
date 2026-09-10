@@ -24,18 +24,21 @@
 @endpush
 
 @section('content')
-<div class="shop product-page" id="shop-app" data-currency="{{ $currency }}" data-whatsapp="{{ $whatsappNumber }}" data-shipping-estimate="{{ $shippingEstimate }}">
-    <script type="application/json" id="shop-products">@json(collect([$product])->merge($relatedProducts)->values())</script>
+<div class="shop product-page" id="shop-app" data-currency="{{ $currency }}" data-whatsapp="{{ $whatsappNumber }}" data-shipping-estimate="{{ $shippingEstimate }}" data-page="product">
+    <script type="application/json" id="shop-products">@json($searchProducts ?? collect([$product])->merge($relatedProducts)->values())</script>
 
-    <header class="header">
-        <div class="header__inner">
-            <a href="{{ route('shop.index') }}" class="logo"><x-site-logo class="logo__icon" /></a>
-            <nav class="header-nav" aria-label="Product navigation"><a href="{{ route('shop.index') }}" class="header-nav__link">← Back to shop</a><a href="{{ route('contact.show') }}" class="header-nav__link">Need help?</a></nav>
-        </div>
-    </header>
+    <x-storefront-header :nav-categories="$navCategories" :storefront="$storefront ?? null" />
 
     <main class="product-page__main">
-        <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ route('shop.index') }}">Shop</a><span>/</span><a href="{{ route('shop.index') }}#products-grid">{{ $product['category_name'] }}</a><span>/</span><span aria-current="page">{{ $product['name'] }}</span></nav>
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="{{ route('shop.index') }}">Home</a>
+            @foreach ($product['category_path'] ?? [] as $index => $slug)
+                <span>/</span>
+                <a href="{{ route('shop.category', $slug) }}">{{ $product['category_path_names'][$index] ?? $slug }}</a>
+            @endforeach
+            <span>/</span>
+            <span aria-current="page">{{ $product['name'] }}</span>
+        </nav>
 
         <section class="product-detail" aria-labelledby="product-title">
             <div class="product-detail__gallery">
@@ -94,9 +97,11 @@
         </section>
 
         @if ($relatedProducts->isNotEmpty())
-            <section class="related-products" aria-labelledby="related-title"><div class="catalog-heading"><div><span class="section-eyebrow">Keep exploring</span><h2 id="related-title">More from {{ $product['category_name'] }}</h2></div><a href="{{ route('shop.index') }}#products-grid" class="text-link">View all seeds →</a></div><div class="related-products__grid">@foreach ($relatedProducts as $related)<article><a href="{{ route('products.show', $related['id']) }}" class="related-products__image">@if ($related['image'])<img src="{{ $related['image'] }}" alt="{{ $related['name'] }} seed pack" loading="lazy">@else<span>{{ $related['emoji'] }}</span>@endif</a><p>{{ $related['category_name'] }}</p><h3><a href="{{ route('products.show', $related['id']) }}">{{ $related['name'] }}</a></h3><div><strong>{{ $currency }}{{ number_format($related['price'], 2) }}</strong><button type="button" data-add-to-cart data-id="{{ $related['id'] }}" data-name="{{ $related['name'] }}" data-price="{{ $related['price'] }}" data-stock="{{ $related['stock_quantity'] }}" data-unit="{{ $related['unit'] }}" data-emoji="{{ $related['emoji'] }}" data-image="{{ $related['image'] ?? '' }}" @disabled(! $related['in_stock'])>+</button></div></article>@endforeach</div></section>
+            <section class="related-products" aria-labelledby="related-title"><div class="catalog-heading"><div><span class="section-eyebrow">Keep exploring</span><h2 id="related-title">More from {{ $product['category_name'] }}</h2></div><a href="{{ route('shop.category', $product['category']) }}" class="text-link">View all in {{ $product['category_name'] }} →</a></div><div class="related-products__grid">@foreach ($relatedProducts as $related)<article><a href="{{ route('products.show', $related['id']) }}" class="related-products__image">@if ($related['image'])<img src="{{ $related['image'] }}" alt="{{ $related['name'] }} seed pack" loading="lazy">@else<span>{{ $related['emoji'] }}</span>@endif</a><p>{{ $related['category_name'] }}</p><h3><a href="{{ route('products.show', $related['id']) }}">{{ $related['name'] }}</a></h3><div><strong>{{ $currency }}{{ number_format($related['price'], 2) }}</strong><button type="button" data-add-to-cart data-id="{{ $related['id'] }}" data-name="{{ $related['name'] }}" data-price="{{ $related['price'] }}" data-stock="{{ $related['stock_quantity'] }}" data-unit="{{ $related['unit'] }}" data-emoji="{{ $related['emoji'] }}" data-image="{{ $related['image'] ?? '' }}" @disabled(! $related['in_stock'])>+</button></div></article>@endforeach</div></section>
         @endif
     </main>
+
+    <x-storefront-drawers :currency="$currency" :include-product-modal="false" />
 </div>
 @endsection
 
