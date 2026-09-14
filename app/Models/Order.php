@@ -14,6 +14,23 @@ class Order extends Model
 
     public const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered', 'cancelled', 'rto', 'returned'];
 
+    public const TRANSITIONS = [
+        'pending' => ['confirmed', 'cancelled'],
+        'confirmed' => ['processing', 'cancelled'],
+        'processing' => ['shipped', 'cancelled'],
+        'shipped' => ['out_for_delivery', 'delivered', 'rto'],
+        'out_for_delivery' => ['delivered', 'rto'],
+        'delivered' => ['returned'],
+        'rto' => ['processing', 'returned', 'cancelled'],
+        'returned' => [],
+        'cancelled' => [],
+    ];
+
+    public function canTransitionTo(string $to): bool
+    {
+        return in_array($to, self::TRANSITIONS[$this->status] ?? [], true);
+    }
+
     protected $fillable = [
         'user_id', 'order_number', 'status', 'payment_status', 'payment_method',
         'payment_gateway', 'gateway_order_id', 'gateway_payment_id', 'gateway_signature',
