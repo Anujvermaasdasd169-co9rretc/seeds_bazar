@@ -20,7 +20,11 @@
             </svg>
             Purchase on WhatsApp
         </button>
-        <a href="{{ route('checkout') }}" class="btn btn--cart-full">Checkout</a>
+        <div class="cart-ship" id="cart-ship" hidden>
+            <div class="cart-ship__bar"><span id="cart-ship-fill"></span></div>
+            <p id="cart-ship-copy"></p>
+        </div>
+        <a href="{{ route('checkout') }}" class="btn btn--cart-full" id="btn-checkout">Checkout &amp; pay</a>
         <button type="button" class="btn btn--ghost" id="btn-clear-cart">Clear Cart</button>
     </div>
 </aside>
@@ -117,8 +121,10 @@
 
             <div class="modal__actions">
                 <span class="modal__note">Fields marked * are required.</span>
-                <button type="submit" class="modal__submit">Submit</button>
-            </div>
+            <button type="submit" class="modal__submit">Submit</button>
+        </div>
         </form>
     </div>
 </div>
+
+<x-account-hub />

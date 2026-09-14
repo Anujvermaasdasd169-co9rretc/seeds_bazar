@@ -30,15 +30,9 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
-            $response = back()->withInput($request->only('email'))->withErrors([
+            return back()->withInput($request->only('email'))->withErrors([
                 'email' => 'The provided credentials are incorrect.',
-            ]);
-
-            if ($request->boolean('login_modal')) {
-                $response->with('open_login_modal', true);
-            }
-
-            return $response;
+            ])->with('account_panel', 'login');
         }
 
         $request->session()->regenerate();
@@ -167,7 +161,7 @@ class AuthController extends Controller
         $data = $request->validated();
         $request->user()->update($data + ['name' => trim($data['first_name'].' '.$data['last_name'])]);
 
-        return back()->with('status', 'Your profile has been updated.');
+        return back()->with('status', 'Your profile has been updated.')->with('account_panel', 'profile');
     }
 
     public function changePassword(ChangePasswordRequest $request): RedirectResponse

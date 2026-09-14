@@ -25,6 +25,7 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+    <script src="{{ asset('js/account-hub.js') }}?v={{ @filemtime(public_path('js/account-hub.js')) ?: time() }}" defer></script>
     @stack('scripts')
 </body>
 </html>

@@ -1,12 +1,12 @@
-@extends('layouts.auth')
+@extends('layouts.storefront-auth', ['accountPanel' => $addresses->isEmpty() ? 'addresses' : 'profile', 'accountOpen' => $addresses->isEmpty()])
 @section('title', 'Checkout')
-@section('content')
+@section('page')
 <section class="auth-card checkout-card" aria-labelledby="checkout-title">
     <p class="auth-eyebrow">Secure checkout</p>
     <h1 id="checkout-title">Complete your order</h1>
     @if ($addresses->isEmpty())
-        <p class="auth-copy">Add a delivery address before placing your order.</p>
-        <p class="auth-footer"><a href="{{ route('addresses.index') }}">Manage addresses</a></p>
+        <p class="auth-copy">Add a delivery address in the panel — then place your order here.</p>
+        <p class="auth-footer"><a href="{{ route('addresses.index') }}" class="js-account-link" data-account-panel="addresses">Add an address</a></p>
     @else
         @include('auth.partials.messages')
         <form method="POST" action="{{ route('checkout.store') }}" class="auth-form" id="checkout-form">
@@ -15,12 +15,15 @@
             <select id="address_id" name="address_id" required>
                 <option value="">Choose an address</option>
                 @foreach ($addresses as $address)
-                    <option value="{{ $address->id }}" @selected($address->is_default)>{{ $address->full_name }} - {{ $address->city }}, {{ $address->state }} ({{ $address->phone }})</option>
+                    <option value="{{ $address->id }}" @selected($address->is_default)>{{ $address->full_name }} — {{ $address->city }}, {{ $address->state }}</option>
                 @endforeach
             </select>
-            <p class="auth-links"><a href="{{ route('addresses.index') }}">Add or manage addresses</a></p>
+            <p class="auth-links"><a href="{{ route('addresses.index') }}" class="js-account-link" data-account-panel="addresses">Add or edit addresses</a></p>
             <label for="payment_method">Payment method</label>
-            <select id="payment_method" name="payment_method" required><option value="cod">Cash on Delivery</option><option value="online">Online Payment</option></select>
+            <select id="payment_method" name="payment_method" required>
+                <option value="cod">Cash on Delivery</option>
+                <option value="online">Online Payment</option>
+            </select>
             <div id="checkout-items" class="checkout-items"></div>
             <div class="checkout-summary" id="checkout-summary" hidden>
                 <div><span>Subtotal</span><strong id="checkout-subtotal">Rs 0.00</strong></div>
@@ -29,7 +32,7 @@
                 <div><span>Total</span><strong id="checkout-total">Rs 0.00</strong></div>
             </div>
             <input type="hidden" name="cart" id="checkout-cart">
-            <p class="auth-hint">Final prices are checked securely on the server before the order is created.</p>
+            <p class="auth-hint">Prices are confirmed on the server before the order is created.</p>
             <button class="auth-button" type="submit">Place order</button>
         </form>
     @endif
@@ -38,13 +41,13 @@
 @push('scripts')
 <script>
     const cart = JSON.parse(localStorage.getItem('seeds_bazar_cart') || '[]').map(item => ({ id: Number(item.id), quantity: Number(item.quantity) })).filter(item => item.id && item.quantity > 0);
-    const csrf = document.querySelector('input[name="_token"]')?.value;
+    const csrf = document.querySelector('#checkout-form input[name="_token"]')?.value;
     const address = document.getElementById('address_id');
     const cartInput = document.getElementById('checkout-cart');
     const quoteUrl = @json(route('checkout.quote'));
     if (cartInput) cartInput.value = JSON.stringify(cart);
     const items = document.getElementById('checkout-items');
-    if (items) items.innerHTML = cart.length ? `<strong>${cart.reduce((total, item) => total + item.quantity, 0)} item(s) in your order</strong>` : '<p>Your cart is empty. Add seeds from the shop before placing an order.</p>';
+    if (items) items.innerHTML = cart.length ? `<strong>${cart.reduce((total, item) => total + item.quantity, 0)} item(s) ready to grow</strong>` : '<p>Your cart is empty. Add seeds from the shop first.</p>';
     async function refreshQuote() {
         const summary = document.getElementById('checkout-summary');
         if (!summary || !cart.length || !address?.value) { if (summary) summary.hidden = true; return; }

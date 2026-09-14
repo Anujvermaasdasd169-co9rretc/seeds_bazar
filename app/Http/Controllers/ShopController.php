@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class ShopController extends Controller
@@ -26,6 +28,12 @@ class ShopController extends Controller
             ? $childCategories->mapWithKeys(fn (Category $child) => [$child->slug => $child->displayName()])->all()
             : $navCategories->mapWithKeys(fn (Category $item) => [$item->slug => $item->displayName()])->all();
 
+        $homeReviews = $activeCategory ? collect() : Review::with(['product', 'user'])
+            ->where('status', 'approved')
+            ->whereHas('product', fn ($query) => $query->where('is_active', true))
+            ->latest()
+            ->get();
+
         return view('shop.index', [
             'products' => $this->catalogProducts($activeCategory),
             'categories' => $filterCategories,
@@ -39,11 +47,11 @@ class ShopController extends Controller
             'tagline' => Setting::get('tagline', config('seeds_bazar.tagline')),
             'whatsappNumber' => Setting::get('whatsapp_number', config('seeds_bazar.whatsapp_number')),
             'shippingEstimate' => Setting::get('shipping_estimate', config('seeds_bazar.shipping.estimate')),
-            'reviews' => $activeCategory ? collect() : Review::with('product')
-                ->where('status', 'approved')
-                ->whereHas('product', fn ($query) => $query->where('is_active', true))
-                ->latest()
-                ->get(),
+            'reviews' => $activeCategory ? collect() : $homeReviews,
+            'reviewStats' => $activeCategory ? null : $this->reviewStats($homeReviews),
+            'verifiedPurchases' => $activeCategory ? [] : $this->verifiedPurchaseKeys($homeReviews),
+            'freeShipping' => Setting::get('free_shipping_threshold', (string) config('seeds_bazar.shipping.free_threshold')),
+            'shippingFlat' => Setting::get('shipping_flat_rate', (string) config('seeds_bazar.shipping.flat_rate')),
         ]);
     }
 
@@ -75,6 +83,9 @@ class ShopController extends Controller
             'whatsappNumber' => Setting::get('whatsapp_number', config('seeds_bazar.whatsapp_number')),
             'shippingEstimate' => Setting::get('shipping_estimate', config('seeds_bazar.shipping.estimate')),
             'shippingMethod' => Setting::get('shipping_method', config('seeds_bazar.shipping.method')),
+            'reviewStats' => $this->reviewStats($product->reviews),
+            'verifiedPurchases' => $this->verifiedPurchaseKeys($product->reviews),
+            'freeShipping' => Setting::get('free_shipping_threshold', (string) config('seeds_bazar.shipping.free_threshold')),
         ]);
     }
 
@@ -87,15 +98,30 @@ class ShopController extends Controller
             'comment' => ['required', 'string', 'max:1000'],
         ]);
 
-        abort_unless(Product::query()->whereKey($validated['product_id'])->where('is_active', true)->exists(), 422, 'This product is not available for review.');
+        $product = Product::query()->whereKey($validated['product_id'])->where('is_active', true)->first();
+        abort_unless($product, 422, 'This product is not available for review.');
 
-        Review::create($validated + [
+        $name = $request->user()?->name ?: $validated['name'];
+
+        Review::create([
+            'product_id' => $product->id,
             'user_id' => $request->user()?->id,
+            'name' => $name,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
             'status' => 'pending',
         ]);
 
+        if ($request->input('redirect_to') === 'product') {
+            return redirect()
+                ->route('products.show', $product)
+                ->withFragment('product-reviews')
+                ->with('review_success', 'Thank you! Your review was submitted for moderation.');
+        }
+
         return redirect()
             ->route('shop.index')
+            ->withFragment('reviews')
             ->with('review_success', 'Thank you! Your review was submitted for moderation.');
     }
 
@@ -169,6 +195,8 @@ class ShopController extends Controller
                 'name' => $review->name,
                 'rating' => (int) $review->rating,
                 'comment' => $review->comment,
+                'date' => optional($review->created_at)->diffForHumans(),
+                'user_id' => $review->user_id,
             ])->values()->all(),
             'cultivation' => collect([
                 'Best sowing season' => $product->sowing_season,
@@ -180,5 +208,55 @@ class ShopController extends Controller
                 'Difficulty' => $product->growing_difficulty,
             ])->filter()->all(),
         ];
+    }
+
+    /**
+     * @param  Collection<int, Review>  $reviews
+     * @return array{count:int,avg:?float,histogram:array<int,int>}
+     */
+    private function reviewStats(Collection $reviews): array
+    {
+        $histogram = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        foreach ($reviews as $review) {
+            $rating = (int) $review->rating;
+            if (isset($histogram[$rating])) {
+                $histogram[$rating]++;
+            }
+        }
+
+        return [
+            'count' => $reviews->count(),
+            'avg' => $reviews->count() ? round((float) $reviews->avg('rating'), 1) : null,
+            'histogram' => $histogram,
+        ];
+    }
+
+    /**
+     * @param  Collection<int, Review>|\Illuminate\Database\Eloquent\Collection<int, Review>  $reviews
+     * @return array<string, bool>
+     */
+    private function verifiedPurchaseKeys($reviews): array
+    {
+        $userIds = collect($reviews)->pluck('user_id')->filter()->unique()->all();
+        $productIds = collect($reviews)->pluck('product_id')->filter()->unique()->all();
+        if ($userIds === [] || $productIds === []) {
+            return [];
+        }
+
+        $rows = Order::query()
+            ->whereIn('user_id', $userIds)
+            ->whereNotIn('status', ['cancelled', 'pending'])
+            ->whereHas('items', fn ($query) => $query->whereIn('product_id', $productIds))
+            ->with('items:id,order_id,product_id')
+            ->get(['id', 'user_id']);
+
+        $keys = [];
+        foreach ($rows as $order) {
+            foreach ($order->items as $item) {
+                $keys[$order->user_id.':'.$item->product_id] = true;
+            }
+        }
+
+        return $keys;
     }
 }

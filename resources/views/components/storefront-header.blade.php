@@ -46,9 +46,9 @@
                 @endif
                 @if ($storefront['show_account'])
                     @auth
-                        <a href="{{ route('account') }}" class="header-link">Account</a>
+                        <a href="{{ route('account') }}" class="header-link js-account-link" data-account-panel="profile">Account</a>
                     @else
-                        <button type="button" class="header-link" id="login-open">Log in</button>
+                        <a href="{{ route('login') }}" class="header-link js-account-link" data-account-panel="login">Log in</a>
                     @endauth
                 @endif
                 <button type="button" class="cart-toggle cart-toggle--wish" id="wishlist-toggle" aria-label="Open wishlist">
@@ -86,44 +86,3 @@
         </div>
     </nav>
 </header>
-
-@guest
-    <div class="modal-overlay" id="login-overlay" hidden></div>
-    <div class="modal modal--login" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden data-open="{{ session('open_login_modal') ? '1' : '0' }}">
-        <button type="button" class="login-modal__close" id="login-close" aria-label="Close">&times;</button>
-        <div class="login-modal__brand">
-            <x-site-logo class="login-modal__logo" />
-            <p class="login-modal__eyebrow">Welcome back</p>
-            <h2 id="login-title">Sign in to Seed Planta</h2>
-        </div>
-        <div class="login-modal__body">
-            @if ($errors->any() && session('open_login_modal'))
-                <div class="modal__alert modal__alert--error">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-            <form method="POST" action="{{ route('login.submit') }}" class="login-modal__form" id="login-form">
-                @csrf
-                <input type="hidden" name="login_modal" value="1">
-                <label class="login-modal__field">
-                    <span>Email</span>
-                    <input id="login-email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required maxlength="255" placeholder="you@example.com" @class(['is-invalid' => $errors->has('email') && session('open_login_modal')])>
-                </label>
-                <label class="login-modal__field">
-                    <span>Password</span>
-                    <input id="login-password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password" @class(['is-invalid' => $errors->has('password') && session('open_login_modal')])>
-                </label>
-                <div class="login-modal__row">
-                    <label class="login-modal__remember">
-                        <input type="checkbox" name="remember" value="1">
-                        <span>Remember me</span>
-                    </label>
-                    <a href="{{ route('password.request') }}">Forgot password?</a>
-                </div>
-                <button type="submit" class="login-modal__submit">Sign in</button>
-            </form>
-            <p class="login-modal__signup">New here? <a href="{{ route('register') }}">Create an account</a></p>
-        </div>
-    </div>
-    <script src="{{ asset('js/login-modal.js') }}?v={{ @filemtime(public_path('js/login-modal.js')) ?: time() }}" defer></script>
-@endguest

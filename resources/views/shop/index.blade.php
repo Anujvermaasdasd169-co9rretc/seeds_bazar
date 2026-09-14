@@ -13,14 +13,24 @@
 <div class="shop" id="shop-app"
      data-whatsapp="{{ $whatsappNumber }}"
     data-currency="{{ $currency }}"
-    data-shipping-estimate="{{ $shippingEstimate }}"
-    data-active-category="{{ $activeCategorySlug ?? 'all' }}"
-    data-page="{{ $activeCategory ? 'category' : 'home' }}">
+     data-shipping-estimate="{{ $shippingEstimate }}"
+     data-active-category="{{ $activeCategorySlug ?? 'all' }}"
+     data-page="{{ $activeCategory ? 'category' : 'home' }}"
+     data-free-shipping="{{ $freeShipping ?? config('seeds_bazar.shipping.free_threshold') }}"
+     data-shipping-flat="{{ $shippingFlat ?? config('seeds_bazar.shipping.flat_rate') }}">
     <script type="application/json" id="shop-products">@json($products)</script>
 
     <x-storefront-header :nav-categories="$navCategories" :storefront="$storefront" />
 
         <x-storefront-banner />
+
+    <section class="trust-strip" aria-label="Why growers buy here">
+        <article><strong>High germination</strong><span>Packed for your climate, with sowing notes on every product.</span></article>
+        <article><strong>Ready in a tap</strong><span>Add to cart, pay COD or UPI, and we dispatch with tracking.</span></article>
+        <article><strong>Free shipping ₹{{ number_format((float) ($freeShipping ?? 999), 0) }}+</strong><span>Standard delivery {{ $shippingEstimate }}.</span></article>
+        <article><strong>Grower support</strong><span>WhatsApp us before you sow — we help you choose.</span></article>
+    </section>
+
 
     @unless ($activeCategory)
     @if (($homeCategories ?? collect())->isNotEmpty())

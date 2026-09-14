@@ -22,7 +22,7 @@ class AddressController extends Controller
     {
         $this->save($request, new Address);
 
-        return back()->with('status', 'Address saved.');
+        return back()->with('status', 'Address saved.')->with('account_panel', 'addresses');
     }
 
     public function update(AddressRequest $request, Address $address): RedirectResponse
@@ -30,7 +30,7 @@ class AddressController extends Controller
         abort_unless($address->user_id === $request->user()->id, 404);
         $this->save($request, $address);
 
-        return back()->with('status', 'Address updated.');
+        return back()->with('status', 'Address updated.')->with('account_panel', 'addresses');
     }
 
     public function destroy(Address $address): RedirectResponse
@@ -38,7 +38,7 @@ class AddressController extends Controller
         abort_unless($address->user_id === request()->user()->id, 404);
         $address->delete();
 
-        return back()->with('status', 'Address removed.');
+        return back()->with('status', 'Address removed.')->with('account_panel', 'addresses');
     }
 
     public function makeDefault(Address $address): RedirectResponse
@@ -49,7 +49,7 @@ class AddressController extends Controller
             $address->update(['is_default' => true]);
         });
 
-        return back()->with('status', 'Default address updated.');
+        return back()->with('status', 'Default address updated.')->with('account_panel', 'addresses');
     }
 
     private function save(AddressRequest $request, Address $address): void
