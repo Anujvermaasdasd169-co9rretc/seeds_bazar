@@ -59,6 +59,14 @@ class StorefrontContentTest extends TestCase
             ->assertDontSee(route('products.show', $hidden), false);
     }
 
+    public function test_robots_txt_includes_absolute_sitemap_and_hides_private_paths(): void
+    {
+        $this->get(route('robots'))
+            ->assertOk()
+            ->assertSee('Disallow: /admin/', false)
+            ->assertSee('Sitemap: '.url('/sitemap.xml'), false);
+    }
+
     public function test_admin_store_settings_update_the_public_storefront(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);

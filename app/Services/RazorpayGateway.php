@@ -56,6 +56,30 @@ class RazorpayGateway
         return hash_equals($expected, $signature);
     }
 
+    public function verifyWebhook(string $payload, string $signature): bool
+    {
+        $secret = (string) config('services.razorpay.webhook_secret');
+        if ($secret === '' || $signature === '') {
+            return false;
+        }
+
+        return hash_equals(hash_hmac('sha256', $payload, $secret), $signature);
+    }
+
+    /** @return array{id: string} */
+    public function refund(string $paymentId, int $amountPaise): array
+    {
+        $response = $this->client()->post('/payments/'.rawurlencode($paymentId).'/refund', [
+            'amount' => $amountPaise,
+        ]);
+
+        if (! $response->successful() || ! filled($response->json('id'))) {
+            throw new RuntimeException('Razorpay refund failed.');
+        }
+
+        return ['id' => (string) $response->json('id')];
+    }
+
     private function client(): PendingRequest
     {
         if (! $this->configured()) {

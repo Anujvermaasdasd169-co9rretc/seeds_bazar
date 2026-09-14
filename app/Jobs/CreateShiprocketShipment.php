@@ -33,6 +33,10 @@ class CreateShiprocketShipment implements ShouldQueue
             return;
         }
 
+        if ($order->payment_method === 'online' && $order->payment_status !== 'paid') {
+            return;
+        }
+
         $shipment = $order->shipment ?: $order->shipment()->create([
             'status' => Shipment::STATUS_PENDING,
             'provider' => 'shiprocket',

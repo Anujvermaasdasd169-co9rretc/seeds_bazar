@@ -45,6 +45,18 @@
                 <p>{{ $order->shipping_address }}</p>
                 <small>{{ $order->delivery_estimate ?: 'No delivery estimate' }}</small>
             </div>
+            @if ($order->shipment)
+                <div class="order-show__tile">
+                    <span class="order-show__label">Shipment</span>
+                    <strong>{{ ucfirst($order->shipment->status) }}</strong>
+                    @if ($order->shipment->awb)
+                        <small>AWB {{ $order->shipment->awb }}</small>
+                    @endif
+                    @if ($order->shipment->last_error)
+                        <small>{{ $order->shipment->last_error }}</small>
+                    @endif
+                </div>
+            @endif
         </div>
 
         <form method="POST" action="{{ route('admin.orders.update', $order) }}" class="order-show__status">
@@ -52,15 +64,16 @@
             @method('PATCH')
             <label class="form-field">
                 <span>Update status</span>
-                <select name="status">
-                    @foreach (App\Models\Order::STATUSES as $status)
-                        @if ($status !== 'cancelled' || in_array($order->status, ['pending', 'confirmed', 'processing', 'cancelled'], true))
-                            <option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst($status) }}</option>
-                        @endif
+                <select name="status" @disabled($order->status === 'cancelled')>
+                    @php
+                        $allowed = array_unique(array_merge([$order->status], $order::TRANSITIONS[$order->status] ?? []));
+                    @endphp
+                    @foreach ($allowed as $status)
+                        <option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
                     @endforeach
                 </select>
             </label>
-            <button class="btn btn--primary" type="submit">Save</button>
+            <button class="btn btn--primary" type="submit" @disabled($order->status === 'cancelled')>Save</button>
         </form>
     </div>
 
@@ -98,6 +111,14 @@
             <div><dt>Shipping</dt><dd>{{ $order->shipping_charge > 0 ? '₹'.number_format($order->shipping_charge, 2) : 'FREE' }}</dd></div>
             <div class="order-show__grand"><dt>Total</dt><dd>₹{{ number_format($order->total, 2) }}</dd></div>
         </dl>
+        @if ($order->statusHistories->isNotEmpty())
+            <h2 class="card__title">Status history</h2>
+            <ul>
+                @foreach ($order->statusHistories as $history)
+                    <li>{{ $history->created_at?->format('d M Y, h:i A') }} — {{ $history->from_status ?: 'new' }} → {{ $history->to_status }}@if ($history->note) ({{ $history->note }})@endif</li>
+                @endforeach
+            </ul>
+        @endif
     </div>
 </div>
 @endsection

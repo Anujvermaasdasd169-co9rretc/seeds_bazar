@@ -4,6 +4,8 @@ return [
 
     'whatsapp_number' => env('WHATSAPP_NUMBER', '919876543210'),
 
+    'admin_email' => env('ADMIN_EMAIL'),
+
     'currency' => '₹',
 
     'tagline' => 'Quality seeds for your farm & garden',

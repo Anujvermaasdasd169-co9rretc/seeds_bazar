@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\OrderNotCancellableException;
 use App\Exceptions\OutOfStockException;
 use App\Jobs\CreateShiprocketShipment;
 use App\Mail\OrderPlacedMail;
@@ -14,6 +15,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 
 class OrderService
 {
@@ -21,6 +23,7 @@ class OrderService
         private readonly InventoryService $inventory,
         private readonly ShippingService $shipping,
         private readonly CartService $carts,
+        private readonly RazorpayGateway $gateway,
     ) {}
 
     /**
@@ -131,9 +134,64 @@ class OrderService
             return $order->load('items');
         });
 
-        $this->afterCommit($order);
+        $this->afterPlace($order);
 
         return $order;
+    }
+
+    public function confirmPaid(Order $order, string $paymentId, ?string $checkoutSignature = null): Order
+    {
+        $payment = $this->gateway->fetchPayment($paymentId);
+        $valid = $payment['order_id'] === $order->gateway_order_id
+            && $payment['amount'] === (int) round((float) $order->total * 100)
+            && $payment['status'] === 'captured';
+
+        if ($checkoutSignature !== null) {
+            $valid = $valid && $this->gateway->verifySignature(
+                (string) $order->gateway_order_id,
+                $paymentId,
+                $checkoutSignature,
+            );
+        }
+
+        if (! $valid) {
+            throw new RuntimeException('Invalid payment verification.');
+        }
+
+        $alreadyPaid = false;
+        $confirmed = DB::transaction(function () use ($order, $paymentId, $checkoutSignature, &$alreadyPaid): Order {
+            $lockedOrder = Order::query()->lockForUpdate()->findOrFail($order->id);
+            if ($lockedOrder->payment_status === 'paid') {
+                $alreadyPaid = true;
+
+                return $lockedOrder;
+            }
+            if ($lockedOrder->status === 'cancelled') {
+                throw new OrderNotCancellableException('Cancelled orders cannot be paid.');
+            }
+
+            $from = $lockedOrder->status;
+            $this->inventory->deductForOrder($lockedOrder);
+            $lockedOrder->update([
+                'payment_status' => 'paid',
+                'status' => 'confirmed',
+                'gateway_payment_id' => $paymentId,
+                'gateway_signature' => $checkoutSignature,
+                'paid_at' => now(),
+                'payment_failure_reason' => null,
+            ]);
+            if ($from !== 'confirmed') {
+                $this->recordStatus($lockedOrder, $from, 'confirmed', 'Payment captured');
+            }
+
+            return $lockedOrder->fresh('items');
+        });
+
+        if (! $alreadyPaid) {
+            DB::afterCommit(fn () => $this->notifyAndFulfill($confirmed));
+        }
+
+        return $confirmed;
     }
 
     public function recordStatus(Order $order, ?string $from, string $to, ?string $note = null, ?int $actorId = null): void
@@ -156,25 +214,38 @@ class OrderService
         return 'SP'.$number;
     }
 
-    private function afterCommit(Order $order): void
+    private function afterPlace(Order $order): void
     {
         DB::afterCommit(function () use ($order): void {
-            $email = $order->shipping_email ?: $order->guest_email ?: $order->user?->email;
-            if (filled($email)) {
-                try {
-                    Mail::to($email)->queue(new OrderPlacedMail($order->load('items')));
-                } catch (\Throwable) {
-                    // Order must not fail because mail is misconfigured.
-                }
-            }
-
-            CreateShiprocketShipment::dispatch($order->id);
-
             try {
                 $this->carts->clear($this->carts->current());
             } catch (\Throwable) {
-                //
+                // Cart persistence is optional until API routes are enabled.
+            }
+
+            if ($order->payment_method === 'cod') {
+                $this->notifyAndFulfill($order);
             }
         });
+    }
+
+    private function notifyAndFulfill(Order $order): void
+    {
+        $order->loadMissing(['items', 'user']);
+        $email = $order->shipping_email ?: $order->guest_email ?: $order->user?->email;
+        if (filled($email)) {
+            try {
+                $mail = Mail::to($email);
+                $admin = config('seeds_bazar.admin_email');
+                if (filled($admin) && strcasecmp((string) $admin, (string) $email) !== 0) {
+                    $mail->bcc((string) $admin);
+                }
+                $mail->queue(new OrderPlacedMail($order));
+            } catch (\Throwable) {
+                // Order must not fail because mail is misconfigured.
+            }
+        }
+
+        CreateShiprocketShipment::dispatch($order->id);
     }
 }

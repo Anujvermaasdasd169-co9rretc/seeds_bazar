@@ -14,9 +14,28 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RazorpayWebhookController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/robots.txt', function () {
+    $body = implode("\n", [
+        'User-agent: *',
+        'Disallow: /admin/',
+        'Disallow: /account/',
+        'Disallow: /checkout',
+        'Disallow: /orders/',
+        'Disallow: /webhooks/',
+        '',
+        'Sitemap: '.url('/sitemap.xml'),
+        '',
+    ]);
+
+    return response($body, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('robots');
+
+Route::post('/webhooks/razorpay', RazorpayWebhookController::class)->name('webhooks.razorpay');
 
 Route::get('/', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/c/{category:slug}', [ShopController::class, 'index'])->name('shop.category');

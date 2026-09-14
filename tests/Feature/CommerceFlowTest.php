@@ -7,10 +7,12 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Mail\OrderPlacedMail;
 use App\Services\InventoryService;
 use App\Services\RazorpayGateway;
 use App\Services\ShippingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class CommerceFlowTest extends TestCase
@@ -19,6 +21,7 @@ class CommerceFlowTest extends TestCase
 
     public function test_authenticated_customer_can_create_a_cod_order_using_server_prices(): void
     {
+        Mail::fake();
         [$user, $address, $product] = $this->commerceFixtures();
 
         $response = $this->actingAs($user)->post(route('checkout.store'), [
@@ -46,6 +49,10 @@ class CommerceFlowTest extends TestCase
             'after_stock' => 3,
             'reference_id' => $order->id,
         ]);
+        $this->assertDatabaseHas('shipments', ['order_id' => $order->id]);
+        $this->assertDatabaseHas('order_status_histories', ['order_id' => $order->id, 'to_status' => 'pending']);
+        $this->assertTrue(str_starts_with($order->order_number, 'SP'));
+        Mail::assertQueued(OrderPlacedMail::class);
     }
 
     public function test_checkout_rejects_inactive_products(): void
@@ -300,16 +307,65 @@ class CommerceFlowTest extends TestCase
         $this->assertSame(5, $product->fresh()->stock_quantity);
     }
 
-    public function test_paid_online_cancellation_restores_stock_without_marking_refunded(): void
+    public function test_paid_online_cancellation_restores_stock_and_refunds(): void
     {
         [$user, $address, $product] = $this->commerceFixtures();
         $order = $this->createOnlineOrder($user, $address, $product);
         app(InventoryService::class)->deductForOrder($order);
-        $order->update(['payment_status' => 'paid', 'status' => 'confirmed', 'paid_at' => now()]);
+        $order->update([
+            'payment_status' => 'paid',
+            'status' => 'confirmed',
+            'paid_at' => now(),
+            'gateway_payment_id' => 'pay_test',
+        ]);
+        $gateway = $this->mock(RazorpayGateway::class);
+        $gateway->shouldReceive('refund')->once()->with('pay_test', 24000)->andReturn(['id' => 'rfnd_test']);
 
         $this->actingAs($user)->post(route('orders.cancel', $order))->assertRedirect();
         $this->assertSame('cancelled', $order->fresh()->status);
+        $this->assertSame('refunded', $order->fresh()->payment_status);
+        $this->assertSame(5, $product->fresh()->stock_quantity);
+    }
+
+    public function test_razorpay_webhook_confirms_a_captured_payment(): void
+    {
+        [$user, $address, $product] = $this->commerceFixtures();
+        $order = $this->createOnlineOrder($user, $address, $product);
+        config(['services.razorpay.webhook_secret' => 'whsec']);
+        $gateway = $this->mock(RazorpayGateway::class);
+        $gateway->shouldReceive('verifyWebhook')->once()->andReturn(true);
+        $gateway->shouldReceive('fetchPayment')->with('pay_hook')->once()->andReturn([
+            'amount' => 24000, 'order_id' => 'order_test', 'status' => 'captured',
+        ]);
+
+        $this->postJson(route('webhooks.razorpay'), [
+            'event' => 'payment.captured',
+            'payload' => [
+                'payment' => [
+                    'entity' => [
+                        'id' => 'pay_hook',
+                        'order_id' => 'order_test',
+                        'amount' => 24000,
+                        'status' => 'captured',
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
         $this->assertSame('paid', $order->fresh()->payment_status);
+        $this->assertSame('confirmed', $order->fresh()->status);
+        $this->assertSame(3, $product->fresh()->stock_quantity);
+    }
+
+    public function test_unpaid_online_orders_expire_after_the_grace_period(): void
+    {
+        [$user, $address, $product] = $this->commerceFixtures();
+        $order = $this->createOnlineOrder($user, $address, $product);
+        $order->forceFill(['created_at' => now()->subHour()])->save();
+
+        $this->artisan('orders:expire-unpaid')->assertSuccessful();
+
+        $this->assertSame('cancelled', $order->fresh()->status);
         $this->assertSame(5, $product->fresh()->stock_quantity);
     }
 
