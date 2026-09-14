@@ -30,9 +30,15 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withInput($request->only('email'))->withErrors([
+            $response = back()->withInput($request->only('email'))->withErrors([
                 'email' => 'The provided credentials are incorrect.',
             ]);
+
+            if ($request->boolean('login_modal')) {
+                $response->with('open_login_modal', true);
+            }
+
+            return $response;
         }
 
         $request->session()->regenerate();

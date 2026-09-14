@@ -104,7 +104,7 @@
             if (cartOverlay) cartOverlay.hidden = true;
             if (cartDrawer) cartDrawer.hidden = true;
         }, 300);
-        if (!wishlistDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open')) {
+        if (!wishlistDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open') && !document.getElementById('login-modal')?.classList.contains('is-open')) {
             document.body.style.overflow = '';
         }
     }
@@ -666,7 +666,7 @@
         };
         if (immediate) hide();
         else setTimeout(hide, 300);
-        if (!cartDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open')) {
+        if (!cartDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open') && !document.getElementById('login-modal')?.classList.contains('is-open')) {
             document.body.style.overflow = '';
         }
     }
@@ -815,7 +815,7 @@
         if (!productOverlay || !productModal) return;
         productOverlay.classList.remove('is-open');
         productModal.classList.remove('is-open');
-        if (!cartDrawer?.classList.contains('is-open') && !wishlistDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open')) {
+        if (!cartDrawer?.classList.contains('is-open') && !wishlistDrawer?.classList.contains('is-open') && !document.getElementById('contact-modal')?.classList.contains('is-open') && !document.getElementById('login-modal')?.classList.contains('is-open')) {
             document.body.style.overflow = '';
         }
         setTimeout(() => {
