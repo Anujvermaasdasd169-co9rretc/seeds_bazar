@@ -37,6 +37,14 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        if (! $request->session()->has('url.intended')) {
+            $intended = (string) $request->input('intended', '');
+            $path = parse_url($intended, PHP_URL_PATH) ?: '';
+            if ($path !== '' && str_starts_with($path, '/') && ! str_starts_with($path, '//')) {
+                $request->session()->put('url.intended', url($path));
+            }
+        }
+
         return redirect()->intended(route('account'));
     }
 
@@ -86,7 +94,7 @@ class AuthController extends Controller
 
         Password::sendResetLink(['email' => $email]);
 
-        return back()->with('status', 'If an account matches that email, a password reset link has been sent.');
+        return back()->with('status', 'If an account matches that email, a password reset link has been sent.')->with('account_panel', 'forgot');
     }
 
     public function showResetPassword(string $token): View
@@ -123,7 +131,7 @@ class AuthController extends Controller
             ]);
         }
 
-        return redirect()->route('login')->with('status', 'Your password has been reset. You can now sign in.');
+        return redirect()->route('login')->with('status', 'Your password has been reset. You can now sign in.')->with('account_panel', 'login');
     }
 
     public function verificationNotice(): View
@@ -148,7 +156,7 @@ class AuthController extends Controller
 
         $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('status', 'A fresh verification link has been sent.');
+        return back()->with('status', 'A fresh verification link has been sent.')->with('account_panel', 'verify');
     }
 
     public function account(): View
@@ -172,6 +180,6 @@ class AuthController extends Controller
         $user->update(['password' => $password]);
         Auth::logoutOtherDevices($password);
 
-        return redirect()->route('account')->with('status', 'Your password has been changed.');
+        return redirect()->route('account')->with('status', 'Your password has been changed.')->with('account_panel', 'password');
     }
 }

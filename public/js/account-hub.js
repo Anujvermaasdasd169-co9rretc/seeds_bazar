@@ -19,9 +19,22 @@
         addresses: hub.dataset.routeAddresses,
         verify: hub.dataset.routeVerify,
     };
+    const pageKind = shop?.dataset.page || '';
+    let lastShopUrl = window.location.pathname + window.location.search + window.location.hash;
 
     function paneIndex(name) {
         return Math.max(0, panes.findIndex((pane) => pane.dataset.pane === name));
+    }
+
+    function panelFromPath(path, hash) {
+        const url = String(path || '');
+        if (url.indexOf('/register') !== -1) return 'register';
+        if (url.indexOf('/forgot-password') !== -1) return 'forgot';
+        if (url.indexOf('/addresses') !== -1) return 'addresses';
+        if (url.indexOf('/email/verify') !== -1) return 'verify';
+        if (url.indexOf('/login') !== -1) return 'login';
+        if (url.indexOf('/account') !== -1) return hash === '#password' ? 'password' : 'profile';
+        return null;
     }
 
     function setPanel(name, push) {
@@ -35,6 +48,9 @@
     }
 
     function openHub(name, push) {
+        if (!hub.classList.contains('is-open') && !panelFromPath(window.location.pathname, window.location.hash)) {
+            lastShopUrl = window.location.pathname + window.location.search + window.location.hash;
+        }
         const panel = name || hub.dataset.activePanel || (panes[0] && panes[0].dataset.pane);
         overlay.hidden = false;
         hub.hidden = false;
@@ -56,19 +72,14 @@
         if (!document.getElementById('cart-drawer')?.classList.contains('is-open')) {
             document.body.style.overflow = '';
         }
-        if (restore && shop?.dataset.page !== 'account') {
-            history.pushState({ accountPanel: null }, '', window.location.pathname.split('/login')[0] || hub.dataset.routeHome || '/');
+        if (!restore) return;
+        if (pageKind === 'checkout' || pageKind === 'orders') return;
+        if (pageKind === 'account') {
+            window.location.href = hub.dataset.routeHome || '/';
+            return;
         }
-    }
-
-    function panelFromPath(path, hash) {
-        if (path.indexOf('/register') !== -1) return 'register';
-        if (path.indexOf('/forgot-password') !== -1) return 'forgot';
-        if (path.indexOf('/addresses') !== -1) return 'addresses';
-        if (path.indexOf('/email/verify') !== -1) return 'verify';
-        if (path.indexOf('/login') !== -1) return 'login';
-        if (path.indexOf('/account') !== -1) return hash === '#password' ? 'password' : 'profile';
-        return null;
+        const stay = lastShopUrl && !panelFromPath(lastShopUrl, '');
+        history.pushState({ accountPanel: null }, '', stay ? lastShopUrl : (hub.dataset.routeHome || '/'));
     }
 
     document.addEventListener('click', (event) => {
@@ -80,12 +91,10 @@
         openHub(panel, true);
     });
 
-    closeBtn?.addEventListener('click', () => closeHub(shop?.dataset.page !== 'account'));
-    overlay.addEventListener('click', () => closeHub(shop?.dataset.page !== 'account'));
+    closeBtn?.addEventListener('click', () => closeHub(true));
+    overlay.addEventListener('click', () => closeHub(true));
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && hub.classList.contains('is-open')) {
-            closeHub(shop?.dataset.page !== 'account');
-        }
+        if (event.key === 'Escape' && hub.classList.contains('is-open')) closeHub(true);
     });
 
     let touchStartX = 0;
@@ -104,12 +113,12 @@
     window.addEventListener('popstate', () => {
         const panel = (history.state && history.state.accountPanel) || panelFromPath(window.location.pathname, window.location.hash);
         if (panel && panes.some((pane) => pane.dataset.pane === panel)) openHub(panel, false);
-        else if (shop?.dataset.page !== 'account') closeHub(false);
+        else if (pageKind !== 'account' && pageKind !== 'checkout') closeHub(false);
     });
 
     const pathPanel = panelFromPath(window.location.pathname, window.location.hash);
     const initial = shop?.dataset.accountPanel || pathPanel;
-    const shouldOpen = shop?.dataset.accountOpen === '1' || shop?.dataset.page === 'account' || Boolean(pathPanel);
+    const shouldOpen = shop?.dataset.accountOpen === '1' || Boolean(pathPanel);
     if (initial) setPanel(initial, false);
     if (shouldOpen) openHub(initial, false);
 })();

@@ -13,11 +13,12 @@
 @php
     $accountPanel = $accountPanel ?? 'login';
     $accountOpen = $accountOpen ?? true;
+    $shopPage = $shopPage ?? 'account';
     $freeShip = \App\Models\Setting::get('free_shipping_threshold', (string) config('seeds_bazar.shipping.free_threshold'));
     $flatShip = \App\Models\Setting::get('shipping_flat_rate', (string) config('seeds_bazar.shipping.flat_rate'));
 @endphp
 <div class="shop account-shell" id="shop-app"
-     data-page="account"
+     data-page="{{ $shopPage }}"
      data-account-panel="{{ session('account_panel', $accountPanel) }}"
      data-account-open="{{ ($accountOpen || session('account_panel') || $errors->any() || session('status')) ? '1' : '0' }}"
      data-currency="{{ config('seeds_bazar.currency') }}"

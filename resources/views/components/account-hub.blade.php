@@ -53,15 +53,23 @@
             @endguest
         </div>
 
+        @include('auth.partials.messages')
+
         <div class="account-hub__viewport">
             <div class="account-hub__track" id="account-hub-track">
                 @guest
                     <section class="account-hub__pane" data-pane="login">
                         <p class="auth-eyebrow">Welcome back</p>
                         <h3>Sign in to buy faster</h3>
-                        @include('auth.partials.messages')
                         <form method="POST" action="{{ route('login.submit') }}" class="auth-form">
                             @csrf
+                            @php
+                                $intended = url()->previous();
+                                $appUrl = rtrim((string) config('app.url'), '/');
+                            @endphp
+                            @if ($intended && str_starts_with($intended, $appUrl))
+                                <input type="hidden" name="intended" value="{{ $intended }}">
+                            @endif
                             <label for="hub-login-email">Email address</label>
                             <input id="hub-login-email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
                             @error('email')<p class="field-error">{{ $message }}</p>@enderror
@@ -75,7 +83,6 @@
                     <section class="account-hub__pane" data-pane="register">
                         <p class="auth-eyebrow">Join the garden</p>
                         <h3>Create your account</h3>
-                        @include('auth.partials.messages')
                         <form method="POST" action="{{ route('register.submit') }}" class="auth-form">
                             @csrf
                             <div class="auth-grid">
@@ -100,7 +107,6 @@
                         <p class="auth-eyebrow">Account recovery</p>
                         <h3>Forgot your password?</h3>
                         <p class="auth-copy">We will email a reset link if this address has an account.</p>
-                        @include('auth.partials.messages')
                         <form method="POST" action="{{ route('password.email') }}" class="auth-form">
                             @csrf
                             <label for="hub-forgot-email">Email address</label>
@@ -112,7 +118,6 @@
                     <section class="account-hub__pane" data-pane="profile">
                         <p class="auth-eyebrow">Hello, {{ $user->first_name ?: $user->name }}</p>
                         <h3>Your profile</h3>
-                        @include('auth.partials.messages')
                         @unless ($user->hasVerifiedEmail())
                             <div class="auth-alert auth-alert--notice">Verify your email to keep order updates flowing. <a href="{{ route('verification.notice') }}" class="js-account-link" data-account-panel="verify">Verify now</a></div>
                         @endunless
@@ -133,7 +138,6 @@
                     <section class="account-hub__pane" data-pane="password">
                         <p class="auth-eyebrow">Security</p>
                         <h3>Change password</h3>
-                        @include('auth.partials.messages')
                         <form method="POST" action="{{ route('account.password') }}" class="auth-form">
                             @csrf
                             <label for="hub-current-password">Current password</label>
@@ -149,7 +153,6 @@
                     <section class="account-hub__pane" data-pane="addresses">
                         <p class="auth-eyebrow">Delivery</p>
                         <h3>Your addresses</h3>
-                        @include('auth.partials.messages')
                         <div class="hub-address-list">
                             @forelse ($addresses as $address)
                                 <article class="hub-address-card">
@@ -198,7 +201,6 @@
                         <p class="auth-eyebrow">One last step</p>
                         <h3>Verify your email</h3>
                         <p class="auth-copy">We sent a link to {{ $user->email }}. You can keep shopping while you verify.</p>
-                        @include('auth.partials.messages')
                         <form method="POST" action="{{ route('verification.send') }}" class="auth-form">@csrf<button class="auth-button" type="submit">Send another link</button></form>
                     </section>
                 @endauth

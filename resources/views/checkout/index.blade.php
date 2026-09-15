@@ -1,4 +1,4 @@
-@extends('layouts.storefront-auth', ['accountPanel' => $addresses->isEmpty() ? 'addresses' : 'profile', 'accountOpen' => $addresses->isEmpty()])
+@extends('layouts.storefront-auth', ['accountPanel' => $addresses->isEmpty() ? 'addresses' : 'profile', 'accountOpen' => $addresses->isEmpty(), 'shopPage' => 'checkout'])
 @section('title', 'Checkout')
 @section('page')
 <section class="auth-card checkout-card" aria-labelledby="checkout-title">
